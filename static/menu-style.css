@@ -1,0 +1,183 @@
+body {
+    background-color: black;
+}
+
+div.bg-row{
+    overflow: hidden;
+}
+
+div.bg-container{
+
+}
+
+/* Block */
+span.block {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    float: left;
+}
+
+span.logo-speed-1 {
+    animation: logo-shimmer 3.001s ease-in-out infinite;
+}
+
+span.logo-speed-2 {
+    animation: logo-shimmer 3.037s ease-in-out infinite;
+}
+
+span.logo-speed-3 {
+    animation: logo-shimmer 3.079s ease-in-out infinite;
+}
+
+span.logo-speed-4 {
+    animation: logo-shimmer 3.109s ease-in-out infinite;
+}
+
+span.logo-speed-5 {
+    animation: logo-shimmer 3.137s ease-in-out infinite;
+}
+
+span.logo-speed-6 {
+    animation: logo-shimmer 3.181s ease-in-out infinite;
+}
+
+span.logo-speed-7 {
+    animation: logo-shimmer 3.203s ease-in-out infinite;
+}
+
+span.logo-speed-8 {
+    animation: logo-shimmer 3.221s ease-in-out infinite;
+}
+
+span.logo-speed-9 {
+    animation: logo-shimmer 3.257s ease-in-out infinite;
+}
+
+span.logo-speed-10 {
+    animation: logo-shimmer 3.301s ease-in-out infinite;
+}
+
+span.logo-speed-11 {
+    animation: logo-shimmer 3.319s ease-in-out infinite;
+}
+
+span.logo-speed-12 {
+    animation: logo-shimmer 3.361s ease-in-out infinite;
+}
+
+span.logo-speed-13 {
+    animation: logo-shimmer 3.407s ease-in-out infinite;
+}
+
+span.logo-speed-14 {
+    animation: logo-shimmer 3.349s ease-in-out infinite;
+}
+
+span.logo-speed-15 {
+    animation: logo-shimmer 3.463s ease-in-out infinite;
+}
+
+span.logo-speed-16 {
+    animation: logo-shimmer 3.511s ease-in-out infinite;
+}
+
+span.logo-speed-17 {
+    animation: logo-shimmer 3.533s ease-in-out infinite;
+}
+
+span.logo-speed-18 {
+    animation: logo-shimmer 3.571s ease-in-out infinite;
+}
+
+span.logo-speed-19 {
+    animation: logo-shimmer 3.607s ease-in-out infinite;
+}
+
+span.logo-speed-20 {
+    animation: logo-shimmer 3.631s ease-in-out infinite;
+}
+
+span.logo-speed-21 {
+    animation: logo-shimmer 3.671s ease-in-out infinite;
+}
+
+span.logo-speed-22 {
+    animation: logo-shimmer 3.701s ease-in-out infinite;
+}
+
+span.logo-speed-23 {
+    animation: logo-shimmer 3.727s ease-in-out infinite;
+}
+
+span.logo-speed-24 {
+    animation: logo-shimmer 3.769s ease-in-out infinite;
+}
+
+span.logo-speed-25 {
+    animation: logo-shimmer 3.803s ease-in-out infinite;
+}
+
+span.logo-speed-26 {
+    animation: logo-shimmer 3.823s ease-in-out infinite;
+}
+
+span.logo-speed-27 {
+    animation: logo-shimmer 3.863s ease-in-out infinite;
+}
+
+span.logo-speed-28 {
+    animation: logo-shimmer 3.907s ease-in-out infinite;
+}
+
+span.logo-speed-29 {
+    animation: logo-shimmer 3.919s ease-in-out infinite;
+}
+
+span.logo-speed-30 {
+    animation: logo-shimmer 3.989s ease-in-out infinite;
+}
+
+span.orange {
+    background: #FF7D2E;
+}
+
+span.logo-bg {
+    background: #7F1CA5;
+}
+
+span.dark-1 {
+    background: #FF7D2E;
+}
+
+span.dark-2 {
+    background: #FF7D2E;
+}
+
+span.dark-3 {
+    background: #FF7D2E;
+}
+
+span.dark-4 {
+    background: #FF7D2E;
+}
+
+span.orange-e-bar {
+    position: absolute;
+    width: 20px;
+    height: 10px;
+    margin-top: 10px;
+    background: #FF7D2E;
+}
+
+@keyframes logo-shimmer {
+    50% {
+        background: #AB38D4;
+    }
+}
+
+@keyframes background-shimmer {
+    50% {
+        background: #AB38D4;
+    }
+}

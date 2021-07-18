@@ -1,0 +1,14 @@
+{
+  "name": "bitglitter",
+  "version": "1.0.0",
+  "description": "Embed data inside of images and video.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mark Michon",
+  "license": "MIT",
+  "dependencies": {
+    "play-sound": "^1.1.3"
+  }
+}
