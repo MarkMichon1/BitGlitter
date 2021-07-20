@@ -6,6 +6,15 @@ This is the repo for the BitGlitter desktop app.  It is an ElectronJS powered fr
 
 More will be added as this nears completion. 👍
 
+# Roadmap
+
+- `tba`
+
+# Contributing
+
+- Converting 
+- CSS style overhaul
+
 # MIT License
 
 © 2021 - ∞ Mark Michon

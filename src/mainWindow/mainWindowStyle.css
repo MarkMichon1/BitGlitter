@@ -1,13 +1,36 @@
-body {
-    background-color: black;
+@font-face {
+    font-family: "Source Code Pro";
 }
 
 div.bg-row{
-    overflow: hidden;
 }
 
 div.bg-container{
+    z-index: -1;
+    width: 800px;
+    position: absolute;
+    overflow: visible;
+}
 
+div.button-container{
+    text-align: center;
+    margin-top: 218px;
+}
+
+button {
+    margin-bottom: 18px !important;
+    width: 220px !important;
+    height: 40px !important;
+    font-size: 24px;
+    font-family: 'Source Sans Pro', sans-serif !important;
+}
+
+button.btn-main{
+    background: #7F1CA5 !important;
+}
+
+button.btn-main:hover{
+    background: #922fb8 !important;
 }
 
 /* Block */
@@ -16,6 +39,7 @@ span.block {
     width: 20px;
     height: 20px;
     float: left;
+
 }
 
 span.logo-speed-1 {
@@ -142,25 +166,17 @@ span.orange {
     background: #FF7D2E;
 }
 
+span.bg-placeholder {
+}
+
 span.logo-bg {
     background: #7F1CA5;
 }
 
 span.dark-1 {
-    background: #FF7D2E;
+    background: hsl(214, 9%, 14%);
 }
 
-span.dark-2 {
-    background: #FF7D2E;
-}
-
-span.dark-3 {
-    background: #FF7D2E;
-}
-
-span.dark-4 {
-    background: #FF7D2E;
-}
 
 span.orange-e-bar {
     position: absolute;
@@ -180,4 +196,8 @@ span.orange-e-bar {
     50% {
         background: #AB38D4;
     }
+}
+
+.no-select {
+    user-select: none;
 }
