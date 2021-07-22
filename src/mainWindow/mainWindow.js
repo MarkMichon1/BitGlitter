@@ -88,6 +88,27 @@ function createMainWindow (isDev) {
         },
 
     ]
+
+    if (isDev) {
+        menu.push(
+            {
+                label: 'Dev',
+                submenu: [
+                    { role: 'reload' },
+                    { role: 'forceReload' },
+                    { role: 'toggleDevTools' },
+                    {
+                        type: 'separator'
+                    },
+                    {
+                        label: 'Reset Flask Executable',
+                        click: () => {}
+                    },
+                ]
+            },
+        )
+    }
+
     const mainMenu = Menu.buildFromTemplate(menu)
     Menu.setApplicationMenu(mainMenu)
 

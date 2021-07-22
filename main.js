@@ -4,9 +4,9 @@ const { app } = require('electron')
 
 const createMainWindow = require('./src/mainWindow/mainWindow')
 
-// Toggles dev only functionality; leave below either 'development' or 'production'
-process.env.NODE_ENV = 'development'
-const isDev = process.env.NODE_ENV !== 'production'
+// Toggles dev only functionality; leave below either 'dev' or 'production'
+process.env.NODE_ENV = 'dev'
+const isDev = process.env.NODE_ENV === 'dev'
 
 app.on('ready', () => {
     createMainWindow(isDev)
