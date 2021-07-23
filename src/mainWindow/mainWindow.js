@@ -1,4 +1,14 @@
-const { app, BrowserWindow, Menu } = require('electron')
+const { app, BrowserWindow, Menu, shell } = require('electron')
+
+const createAboutWindow = require('../about/about')
+const createPaletteWindow = require('../palettes/paletteNodeTempName')
+const createPresetsWindow = require('../presets/presets')
+const createReadWindow = require('../read/read')
+const createSavedStreamsWindow = require('../savedStreams/savedStreams')
+const createSettingsWindow = require('../settings/settings')
+const createStatisticsWindow = require('../statistics/statistics')
+const createUserManualWindow = require('../userManual/userManual')
+const createWriteWindow = require('../write/write')
 
 function createMainWindow (isDev) {
     let mainWindow = new BrowserWindow({
@@ -16,15 +26,18 @@ function createMainWindow (isDev) {
             submenu: [
                 {
                     label: 'Write Stream',
-                    click: () => {}
+                    accelerator: 'Ctrl+W',
+                    click: () => createWriteWindow()
                 },
                 {
                     label: 'Read Stream',
-                    click: () => {}
+                    accelerator: !isDev ? 'Ctrl+R' : 'Ctrl+T',
+                    click: () => createReadWindow()
                 },
                 {
                     label: 'Saved Streams',
-                    click: () => {}
+                    accelerator: 'Ctrl+S',
+                    click: () => createSavedStreamsWindow()
                 },
                 {
                   type: 'separator'
@@ -39,23 +52,23 @@ function createMainWindow (isDev) {
             label: 'Preferences',
             submenu: [
                 {
-                    label: 'App Settings',
-                    click: () => {}
-                },
-                {
                     label: 'Palettes',
-                    click: () => {}
+                    click: () => createPaletteWindow()
                 },
                 {
                     label: 'Presets',
-                    click: () => {}
+                    click: () => createPresetsWindow()
+                },
+                {
+                    label: 'Settings',
+                    click: () => createSettingsWindow()
                 },
                 {
                     type: 'separator'
                 },
                 {
                     label: 'Statistics',
-                    click: () => {}
+                    click: () => createStatisticsWindow()
                 }
             ]
         },
@@ -64,25 +77,26 @@ function createMainWindow (isDev) {
             submenu: [
                 {
                     label: 'User Manual',
-                    click: () => {}
+                    accelerator: 'Ctrl+M',
+                    click: () => createUserManualWindow()
                 },
                 {
                     type: 'separator'
                 },
                 {
                     label: 'Github Project Page',
-                    click: () => {}
+                    click: () => shell.openExternal('https://github.com/MarkMichon1/BitGlitter')
                 },
                 {
                     label: 'Discord Server',
-                    click: () => {}
+                    click: () => shell.openExternal('https://discord.com/invite/t9uv2pZ'),
                 },
                 {
                     type: 'separator'
                 },
                 {
                     label: 'About BitGlitter',
-                    click: () => {}
+                    click: () => createAboutWindow()
                 },
             ]
         },
@@ -112,7 +126,7 @@ function createMainWindow (isDev) {
     const mainMenu = Menu.buildFromTemplate(menu)
     Menu.setApplicationMenu(mainMenu)
 
-    mainWindow.loadFile(`${__dirname}/index.html`)
+    mainWindow.loadFile(`${__dirname}/mainWindow.html`)
 
     // External links open in browser rather than in app
     mainWindow.webContents.on('new-window', function(e, url) {
