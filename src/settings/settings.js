@@ -1,5 +1,9 @@
 const { BrowserWindow } = require('electron')
 
+/*
+include option for outputting stream SHA or stream name
+ */
+
 function createSettingsWindow () {
     let settingsWindow = new BrowserWindow({
         backgroundColor: '#25282C',
