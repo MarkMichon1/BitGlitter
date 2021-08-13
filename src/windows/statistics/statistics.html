@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../../assets/css/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../../assets/css/halfmoon.min.css">
+    <link rel="stylesheet" href="../../../assets/css/helperClasses.css">
+    <script src="../../../assets/js/halfmoon.min.js" defer></script>
+    <script src="renderer.js" defer></script>
+</head>
+<body data-set-preferred-mode-onload="true">
+<div class="container no-select">
+    <h1 class="no-select">Statistics</h1>
+    <table class="table">
+        <tbody>
+        <tr>
+            <th>Blocks Wrote</th>
+            <td class="text-right"><span id="blocks-wrote">0</span></td>
+        </tr>
+        <tr>
+            <th>Frames Wrote</th>
+            <td class="text-right"><span id="frames-wrote">0</span></td>
+        </tr>
+        <tr>
+            <th>Data Wrote</th>
+            <td class="text-right"><span id="data-wrote">None</span></td>
+        </tr>
+        <tr>
+            <th>Blocks Read</th>
+            <td class="text-right"><span id="blocks-read">0</span></td>
+        </tr>
+        <tr>
+            <th>Frames Read</th>
+            <td class="text-right"><span id="frames-read">0</span></td>
+        </tr>
+        <tr>
+            <th>Data Read</th>
+            <td class="text-right"><span id="data-read">None</span></td>
+        </tr>
+        <tr>
+            <th><button class="btn" id="close-button" type="button">OK</button>
+                <button onclick="clearStats()" class="btn btn-danger ml-20" type="button">Clear</button></th>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

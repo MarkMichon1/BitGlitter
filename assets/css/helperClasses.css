@@ -1,3 +1,7 @@
 .no-select {
     user-select: none;
 }
+
+.blue {
+    color: #45A3FB;
+}
