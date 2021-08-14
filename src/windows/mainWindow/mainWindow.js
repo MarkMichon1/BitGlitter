@@ -1,13 +1,13 @@
 const { app, BrowserWindow, Menu, shell } = require('electron')
 
 const createAboutWindow = require('../about/about')
-const createPaletteWindow = require('../palettes/paletteNodeTempName')
-const createPresetsWindow = require('../presets/presets')
+const createPaletteOverviewWindow = require('../paletteOverview/paletteOverview')
+//const createPresetsWindow = require('../presets/presets')
 const createReadWindow = require('../read/read')
 const createSavedStreamsWindow = require('../savedStreams/savedStreams')
 const createSettingsWindow = require('../settings/settings')
 const createStatisticsWindow = require('../statistics/statistics')
-const createUserManualWindow = require('../userManual/userManual')
+const createUserManualWindow = require('../userGuide/userGuide')
 const createWriteWindow = require('../write/write')
 
 function createMainWindow (isDev) {
@@ -57,7 +57,8 @@ function createMainWindow (isDev) {
             submenu: [
                 {
                     label: 'Palettes',
-                    click: () => createPaletteWindow(isDev)
+                    accelerator: 'Ctrl+P',
+                    click: () => createPaletteOverviewWindow(isDev)
                 },
                 // {
                 //     label: 'Presets',

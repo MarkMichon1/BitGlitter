@@ -1,0 +1,76 @@
+h1 {
+    position: relative;
+    left: 15px
+}
+
+div.sidebar {
+    position: fixed;
+    width: 180px;
+    background-color: #DDD;
+    overflow-y: scroll;
+    height: 550px;
+    float: top;
+    bottom: 0;
+    margin-top: 50px;
+}
+
+div.content {
+    position: relative;
+    display: inline-block;
+    margin-left: 215px;
+    width: 550px;
+    word-wrap: anywhere;
+
+}
+
+div.bg-row{
+}
+
+div.bg-container{
+    z-index: -1;
+    width: 160px;
+}
+
+span.block {
+    position: relative;
+    width: 20px;
+    height: 20px;
+}
+
+span.block-rendered {
+    transition: background-color .5s ease-in-out;
+    float: left;
+}
+
+ul {
+    margin-bottom: 0;
+}
+
+li {
+    list-style-type: none;
+    font-size: 16px;
+    padding: 2px 5px;
+    margin-bottom: 0;
+    margin-top: 0
+}
+
+li:hover {
+    background: #48444c;
+}
+
+li.active {
+    font-weight: bold;
+    background: #7f7c82;
+}
+
+li.active:hover {
+    font-weight: bold;
+    background: #7f7c82;
+}
+
+.top-buttons {
+    position: fixed;
+    top: 8px;
+    left: 30px;
+    z-index: 100;
+}

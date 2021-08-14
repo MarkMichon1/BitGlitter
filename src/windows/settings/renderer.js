@@ -1,3 +1,3 @@
-const postman = require('postman-request')
+const axios = require('axios')
+const { remote } = require('electron')
 
-c = postman('http://localhost:7218/config/test')

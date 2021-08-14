@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../../assets/css/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../../assets/css/halfmoon.min.css">
+    <link rel="stylesheet" href="../../../assets/css/helperClasses.css">
+    <script src="../../../assets/js/halfmoon.min.js" defer></script>
+    <link rel="stylesheet" href="paletteOverviewStyles.css">
+    <script src="renderer.js" defer></script>
+</head>
+<body data-set-preferred-mode-onload="true">
+<div class="top-buttons">
+    <span data-toggle="tooltip" data-title="Create Palette" data-placement="bottom"><button class="btn btn-success" type="button"><i class="bi bi-plus-square" style="font-size: 2rem; color: black;"></i></button></span>
+    <span data-toggle="tooltip" data-title="Import Palette" data-placement="bottom"><button class="btn btn-primary ml-10" type="button"><i class="bi bi-braces" style="font-size: 2.1rem; color: black;"></i></button></span>
+</div>
+<div class="sidebar no-select"><ul id="palette-list"></ul></div>
+<div class="content">
+    <div class="container no-select">
+        <div class="bg-container">
+            <div class="bg-row">
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+            </div>
+            <div class="bg-row">
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+            </div>
+            <div class="bg-row">
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+            </div>
+            <div class="bg-row">
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+            </div>
+            <div class="bg-row">
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+            </div>
+            <div class="bg-row">
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+            </div>
+            <div class="bg-row">
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+            </div>
+            <div class="bg-row">
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+                <span class="block block-rendered"></span>
+            </div>
+        </div>
+        <h1 id="active-palette-name">---</h1>
+        <table class="table mt-20">
+            <tbody>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="Custom palettes are can be made by anyone, and may not be optimized for performance or data integrity">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>
+                    Custom Palette?
+                </th>
+                <td id="active-palette-is-custom">---</td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="Extra description field attached with the palette">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>
+                    Description
+                </th>
+                <td id="active-palette-description">---</td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="How many bits fit inside of each block (higher is better)">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>
+                    Bit Length
+                </th>
+                <td id="active-palette-bit-length">---</td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="How much space there is between different colors (higher is better).  Affects resistance against corruption and compression">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>
+                    Color Distance
+                </th>
+                <td id="active-palette-color-distance">---</td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="The color set this palette uses">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>
+                    Color Set (<span id="active-palette-number-of-colors"></span>)
+                </th>
+                <td id="active-palette-color-set" class="can-select" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="Internal ID used inside of the BitGlitter protocol.  Each palette ID is completely unique">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>
+                    Palette ID
+                </th>
+                <td id="active-palette-id" class="can-select" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="These codes can be imported on the top of this window, to easily share palettes with others to write with.  IMPORTANT:  Reading streams will automatically learn the used palette!">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>
+                    Palette Share Code
+                </th>
+                <td id="active-palette-b64" class="can-select" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="When this palette was created">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>
+                    Created On
+                </th>
+                <td id="active-palette-time-created">---</td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="A handful of default and custom palettes were included with the stock version of BitGlitter, this tells you whether it is one of them">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>
+                    Included with BitGlitter?
+                </th>
+                <td id="active-palette-is-included-with-repo">---</td>
+            </tr>
+            <tr>
+                <th><button class="btn btn-danger" type="button" disabled="disabled">Delete Palette</button></th>
+            </tr>
+            </tbody>
+        </table>
+        <div class="palette-choice"></div>
+    </div>
+</div>
+</body>
+</html>

@@ -2,6 +2,10 @@
     user-select: none;
 }
 
+.can-select {
+    user-select: all;
+}
+
 .blue {
     color: #45A3FB;
 }
