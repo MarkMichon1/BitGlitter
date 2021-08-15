@@ -11,8 +11,8 @@
 </head>
 <body data-set-preferred-mode-onload="true">
 <div class="top-buttons">
-    <span data-toggle="tooltip" data-title="Create Palette" data-placement="bottom"><button class="btn btn-success" type="button"><i class="bi bi-plus-square" style="font-size: 2rem; color: black;"></i></button></span>
-    <span data-toggle="tooltip" data-title="Import Palette" data-placement="bottom"><button class="btn btn-primary ml-10" type="button"><i class="bi bi-braces" style="font-size: 2.1rem; color: black;"></i></button></span>
+    <span data-toggle="tooltip" data-title="Create Palette" data-placement="bottom" id="create-palette-button"><button class="btn btn-success" type="button"><i class="bi bi-plus-square" style="font-size: 2rem; color: black;"></i></button></span>
+    <span data-toggle="tooltip" data-title="Import Palette" data-placement="bottom" id="import-palette-button"><button class="btn btn-primary ml-10" type="button"><i class="bi bi-braces" style="font-size: 2.1rem; color: black;"></i></button></span>
 </div>
 <div class="sidebar no-select"><ul id="palette-list"></ul></div>
 <div class="content">
@@ -134,13 +134,13 @@
                     <span data-toggle="tooltip" data-title="How much space there is between different colors (higher is better).  Affects resistance against corruption and compression">
                         <i class="bi bi-question-circle blue"></i>
                     </span>
-                    Color Distance
+                    Color Proximity Score
                 </th>
                 <td id="active-palette-color-distance">---</td>
             </tr>
             <tr>
                 <th>
-                    <span data-toggle="tooltip" data-title="The color set this palette uses">
+                    <span data-toggle="tooltip" data-title="The color set this palette uses in RGB format">
                         <i class="bi bi-question-circle blue"></i>
                     </span>
                     Color Set (<span id="active-palette-number-of-colors"></span>)
@@ -163,7 +163,7 @@
                     </span>
                     Palette Share Code
                 </th>
-                <td id="active-palette-b64" class="can-select" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</td>
+                <td id="active-palette-b64" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</td>
             </tr>
             <tr>
                 <th>
@@ -176,7 +176,7 @@
             </tr>
             <tr>
                 <th>
-                    <span data-toggle="tooltip" data-title="A handful of default and custom palettes were included with the stock version of BitGlitter, this tells you whether it is one of them">
+                    <span data-toggle="tooltip" data-title="A handful of default and custom palettes are included with the stock version of BitGlitter, this tells you whether it is one of them">
                         <i class="bi bi-question-circle blue"></i>
                     </span>
                     Included with BitGlitter?
@@ -184,11 +184,15 @@
                 <td id="active-palette-is-included-with-repo">---</td>
             </tr>
             <tr>
-                <th><button class="btn btn-danger" type="button" disabled="disabled">Delete Palette</button></th>
+                <th><button class="btn btn-danger" id="delete-button" type="button" disabled="disabled">Delete Palette</button></th>
+                <td></td>
+            </tr>
+            <tr>
+                <th><button class="btn btn-primary" id="close-button" type="button">OK</button></th>
+                <td></td>
             </tr>
             </tbody>
         </table>
-        <div class="palette-choice"></div>
     </div>
 </div>
 </body>

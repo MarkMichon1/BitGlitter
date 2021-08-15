@@ -1,4 +1,6 @@
-const { BrowserWindow } = require('electron')
+const { BrowserWindow, ipcMain} = require('electron')
+const createCreatePaletteWindow = require('./createPalette/createPalette')
+const createBase64ImportWindow = require('./b64Import/b64Import')
 
 function createPaletteOverviewWindow (isDev) {
     let paletteOverviewWindow = new BrowserWindow({
@@ -22,15 +24,15 @@ function createPaletteOverviewWindow (isDev) {
     paletteOverviewWindow.loadFile(`${__dirname}/paletteOverview.html`)
     // paletteOverviewWindow.setMenu(null)
 
-    // External links open in browser rather than in app
-    paletteOverviewWindow.webContents.on('new-window', function(e, url) {
-        e.preventDefault();
-        require('electron').shell.openExternal(url);
-    })
 
     paletteOverviewWindow.on('ready', () => {
         paletteOverviewWindow = null
     })
 }
+
+// Events
+ipcMain.on('openCreatePaletteWindow', createCreatePaletteWindow)
+
+ipcMain.on('openImportPaletteWindow', createBase64ImportWindow)
 
 module.exports = createPaletteOverviewWindow

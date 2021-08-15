@@ -8,8 +8,7 @@ div.sidebar {
     width: 180px;
     background-color: #DDD;
     overflow-y: scroll;
-    height: 550px;
-    float: top;
+    height: 575px;
     bottom: 0;
     margin-top: 50px;
 }

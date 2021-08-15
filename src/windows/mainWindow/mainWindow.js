@@ -7,7 +7,7 @@ const createReadWindow = require('../read/read')
 const createSavedStreamsWindow = require('../savedStreams/savedStreams')
 const createSettingsWindow = require('../settings/settings')
 const createStatisticsWindow = require('../statistics/statistics')
-const createUserManualWindow = require('../userGuide/userGuide')
+const createUserGuideWindow = require('../userGuide/userGuide')
 const createWriteWindow = require('../write/write')
 
 function createMainWindow (isDev) {
@@ -81,9 +81,9 @@ function createMainWindow (isDev) {
             label: 'Help',
             submenu: [
                 {
-                    label: 'User Manual',
-                    accelerator: 'Ctrl+M',
-                    click: () => createUserManualWindow(isDev)
+                    label: 'User Guide',
+                    accelerator: 'Ctrl+G',
+                    click: () => createUserGuideWindow(isDev)
                 },
                 {
                     type: 'separator'

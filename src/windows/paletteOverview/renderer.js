@@ -1,7 +1,5 @@
 const axios = require('axios')
-const { remote } = require('electron')
-const TimeAgo = require('javascript-time-ago')
-
+const { ipcRenderer, remote } = require('electron')
 
 let paletteList = []
 let activePalette = null
@@ -67,7 +65,46 @@ const generateSampleFrames = async (activeCurrentPalette) => {
     }
 }
 
+const closeWindowButtonHandler = () => {
+    let window = remote.getCurrentWindow();
+    window.close();
+}
+
+const deleteButton = document.getElementById("delete-button")
+let deletePaletteAreYouSure = false
+const deletePaletteButtonHandler = () => {
+    if (activePalette.is_custom) {
+        if (!deletePaletteAreYouSure) {
+            deleteButton.textContent = 'You sure?'
+        } else {
+            // sends request via api to delete
+            axios.post('http://localhost:7218/palettes', {'palette_id': activePalette.palette_id}).then((response) =>
+                {
+                    console.log('ok')
+                }
+            )
+            // removes from palette list
+            // removes event listener
+            // makes palette[0] active
+        }
+    }
+}
+deleteButton.addEventListener('click', deletePaletteButtonHandler)
+
+const createPaletteButtonHandler = () => {
+    ipcRenderer.send('openCreatePaletteWindow')
+}
+
+const importPaletteButtonHandler = () => {
+    ipcRenderer.send('openImportPaletteWindow')
+}
+
 const loadActivePalette = (activePalette) => {
+    // Remove old event listeners
+
+    // Add new event listeners
+
+    // Render content
     activePaletteName.textContent = activePalette.name
     activePaletteDescription.textContent = activePalette.description
     activePaletteColorSet.textContent = prettifyColorString(activePalette)
@@ -79,14 +116,36 @@ const loadActivePalette = (activePalette) => {
     activePaletteIsCustom.textContent = activePalette.is_custom ? 'Yes' : 'No'
     activePaletteIsIncludedWithRepo.textContent = activePalette.is_included_with_repo ? 'Yes' : 'No'
     activePaletteID.textContent = activePalette.palette_id
+    if (activePalette.is_custom) {
+        activePaletteB64.setAttribute('data-toggle', 'tooltip')
+        if (!activePaletteB64.classList.contains('can-select')) {
+            activePaletteB64.classList.add('can-select')
+        }
+        activePaletteB64.textContent = activePalette.base64_string
+    } else {
+        activePaletteB64.removeAttribute('data-toggle')
+        if (activePaletteB64.classList.contains('can-select')) {
+            activePaletteB64.classList.remove('can-select')
+        }
+        activePaletteB64.textContent = 'No code- everyone already has this palette!'
+    }
     noBase64 = 'No code- everyone already has this palette!'
     activePaletteB64.textContent = activePalette.base64_string ? activePalette.base64_string : noBase64
+
+    // Set delete button display state
+    deletePaletteAreYouSure = false
+    if (activePalette.is_custom) {
+        deleteButton.textContent = 'Delete palette'
+        deleteButton.removeAttribute('disabled')
+    } else {
+        deleteButton.textContent = 'Cannot delete default palettes'
+        deleteButton.setAttribute('disabled', 'disabled')
+    }
 }
 
 
 const refreshPaletteList = initial => {
     axios.get('http://localhost:7218/palettes').then((response) => {
-        //todo: remove child elements
         paletteList = response.data
         paletteList.sort((first, second) => {
             let firstLowered = first.name.toLowerCase(),
@@ -131,6 +190,10 @@ const refreshPaletteList = initial => {
         }
     })
 }
+
+document.getElementById("close-button").addEventListener("click", closeWindowButtonHandler)
+document.getElementById("create-palette-button").addEventListener("click", createPaletteButtonHandler)
+document.getElementById("import-palette-button").addEventListener("click", importPaletteButtonHandler)
 
 // Palette list load
 refreshPaletteList(true)
