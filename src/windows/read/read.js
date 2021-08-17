@@ -23,9 +23,7 @@ function createReadWindow (isDev) {
         require('electron').shell.openExternal(url);
     })
 
-    readWindow.on('ready', () => {
-        readWindow = null
-    })
+    return readWindow
 }
 
 module.exports = createReadWindow

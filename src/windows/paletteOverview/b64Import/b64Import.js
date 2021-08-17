@@ -5,7 +5,7 @@ function createBase64ImportWindow (isDev) {
         backgroundColor: '#25282C',
         title: 'Import Palette',
         width: 585,
-        height: 430,
+        height: 200,
         resizable: isDev,
         icon: '',
         webPreferences: {
@@ -22,9 +22,7 @@ function createBase64ImportWindow (isDev) {
     base64ImportWindow.loadFile(`${__dirname}/b64Import.html`)
     base64ImportWindow.setMenu(null)
 
-    base64ImportWindow.on('ready', () => {
-        base64ImportWindow = null
-    })
+    return base64ImportWindow
 }
 
 module.exports = createBase64ImportWindow

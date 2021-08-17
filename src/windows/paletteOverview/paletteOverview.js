@@ -24,10 +24,11 @@ function createPaletteOverviewWindow (isDev) {
     paletteOverviewWindow.loadFile(`${__dirname}/paletteOverview.html`)
     // paletteOverviewWindow.setMenu(null)
 
-
-    paletteOverviewWindow.on('ready', () => {
-        paletteOverviewWindow = null
+    ipcMain.on('importPalette', (event, options) => {
+        paletteOverviewWindow.webContents.send('createdPalette', options)
     })
+
+    return paletteOverviewWindow
 }
 
 // Events

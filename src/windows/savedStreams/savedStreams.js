@@ -23,9 +23,7 @@ function createSavedStreamsWindow (isDev) {
         require('electron').shell.openExternal(url);
     })
 
-    savedStreamsWindow.on('ready', () => {
-        savedStreamsWindow = null
-    })
+    return savedStreamsWindow
 }
 
 module.exports = createSavedStreamsWindow

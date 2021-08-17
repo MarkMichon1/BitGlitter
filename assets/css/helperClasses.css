@@ -9,3 +9,7 @@
 .blue {
     color: #45A3FB;
 }
+
+textarea {
+    resize: none;
+}

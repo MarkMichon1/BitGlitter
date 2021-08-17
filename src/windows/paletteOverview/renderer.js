@@ -143,42 +143,50 @@ const loadActivePalette = (activePalette) => {
     }
 }
 
+const sortPaletteList = () => {
+    paletteList.sort((first, second) => {
+        let firstLowered = first.name.toLowerCase(),
+            secondLowered = second.name.toLowerCase();
+        if (firstLowered < secondLowered) {
+            return -1;
+        }
+        if (firstLowered > secondLowered) {
+            return 1;
+        }
+        return 0;
+    })
+}
+
+const renderPalette = (palette) => {
+    let newLi = document.createElement('li')
+    newLi.setAttribute('palette-id', palette.palette_id)
+    newLi.addEventListener('click', () => {
+        if (activePaletteLi){
+            activePaletteLi.classList.remove('active')
+        }
+        activePaletteLi = newLi
+        newLi.classList.add('active')
+        retrieved = paletteList.filter(obj => {
+            return obj.palette_id === palette.palette_id
+        })[0]
+        if (retrieved !== activePalette) {
+            activePalette = retrieved
+            loadActivePalette(activePalette)
+            generateSampleFrames(activePalette)
+        }
+    })
+    let newContent = document.createTextNode(palette.name)
+    newLi.appendChild(newContent)
+    paletteListElement.appendChild(newLi)
+}
+
 
 const refreshPaletteList = initial => {
     axios.get('http://localhost:7218/palettes').then((response) => {
         paletteList = response.data
-        paletteList.sort((first, second) => {
-            let firstLowered = first.name.toLowerCase(),
-                secondLowered = second.name.toLowerCase();
-            if (firstLowered < secondLowered) {
-                return -1;
-            }
-            if (firstLowered > secondLowered) {
-                return 1;
-            }
-            return 0;
-        });
+        sortPaletteList()
         paletteList.forEach(palette => {
-            let newLi = document.createElement('li')
-            newLi.setAttribute('palette-id', palette.palette_id)
-            newLi.addEventListener('click', () => {
-                if (activePaletteLi){
-                    activePaletteLi.classList.remove('active')
-                }
-                activePaletteLi = newLi
-                newLi.classList.add('active')
-                retrieved = paletteList.filter(obj => {
-                    return obj.palette_id === palette.palette_id
-                })[0]
-                if (retrieved !== activePalette) {
-                    activePalette = retrieved
-                    loadActivePalette(activePalette)
-                    generateSampleFrames(activePalette)
-                }
-            })
-            let newContent = document.createTextNode(palette.name)
-            newLi.appendChild(newContent)
-            paletteListElement.appendChild(newLi)
+            renderPalette(palette)
         })
 
         if (initial) {
@@ -197,3 +205,14 @@ document.getElementById("import-palette-button").addEventListener("click", impor
 
 // Palette list load
 refreshPaletteList(true)
+
+ipcRenderer.on('createdPalette', (event, options) => {
+    paletteList.push(options)
+    sortPaletteList()
+    while (paletteListElement.firstChild) {
+        paletteListElement.removeChild(paletteListElement.firstChild)
+    }
+    paletteList.forEach(palette => {
+        renderPalette(palette)
+    })
+})

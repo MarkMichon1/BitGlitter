@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, shell } = require('electron')
+const { app, BrowserWindow, Menu, shell, ipcMain} = require('electron')
 
 const createAboutWindow = require('../about/about')
 const createPaletteOverviewWindow = require('../paletteOverview/paletteOverview')
@@ -31,17 +31,17 @@ function createMainWindow (isDev) {
                 {
                     label: 'Write Stream',
                     accelerator: 'Ctrl+W',
-                    click: () => createWriteWindow(isDev)
+                    click: () => writeWindow = createWriteWindow(isDev)
                 },
                 {
                     label: 'Read Stream',
                     accelerator: !isDev ? 'Ctrl+R' : 'Ctrl+T',
-                    click: () => createReadWindow(isDev)
+                    click: () => readWindow = createReadWindow(isDev)
                 },
                 {
                     label: 'Saved Streams',
                     accelerator: 'Ctrl+S',
-                    click: () => createSavedStreamsWindow(isDev)
+                    click: () => savedStreamWindow = createSavedStreamsWindow(isDev)
                 },
                 {
                   type: 'separator'
@@ -58,7 +58,7 @@ function createMainWindow (isDev) {
                 {
                     label: 'Palettes',
                     accelerator: 'Ctrl+P',
-                    click: () => createPaletteOverviewWindow(isDev)
+                    click: () => paletteOverviewWindow = createPaletteOverviewWindow(isDev)
                 },
                 // {
                 //     label: 'Presets',
@@ -66,14 +66,14 @@ function createMainWindow (isDev) {
                 // },
                 {
                     label: 'Settings',
-                    click: () => createSettingsWindow(isDev)
+                    click: () => settingsWindow = createSettingsWindow(isDev)
                 },
                 {
                     type: 'separator'
                 },
                 {
                     label: 'Statistics',
-                    click: () => createStatisticsWindow(isDev)
+                    click: () => statisticsWindow = createStatisticsWindow(isDev)
                 }
             ]
         },
@@ -83,7 +83,7 @@ function createMainWindow (isDev) {
                 {
                     label: 'User Guide',
                     accelerator: 'Ctrl+G',
-                    click: () => createUserGuideWindow(isDev)
+                    click: () => userGuideWindow = createUserGuideWindow(isDev)
                 },
                 {
                     type: 'separator'
@@ -101,7 +101,7 @@ function createMainWindow (isDev) {
                 },
                 {
                     label: 'About BitGlitter',
-                    click: () => createAboutWindow(isDev)
+                    click: () => aboutWindow = createAboutWindow(isDev)
                 },
             ]
         },
@@ -140,9 +140,7 @@ function createMainWindow (isDev) {
         require('electron').shell.openExternal(url);
     })
 
-    mainWindow.on('ready', () => {
-        mainWindow = null
-    })
+    return mainMenu
 }
 
 module.exports = createMainWindow

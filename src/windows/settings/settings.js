@@ -31,9 +31,7 @@ function createSettingsWindow (isDev) {
         require('electron').shell.openExternal(url);
     })
 
-    settingsWindow.on('ready', () => {
-        settingsWindow = null
-    })
+    return settingsWindow
 }
 
 module.exports = createSettingsWindow

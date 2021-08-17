@@ -23,9 +23,7 @@ function createWriteWindow (isDev) {
         require('electron').shell.openExternal(url);
     })
 
-    writeWindow.on('ready', () => {
-        writeWindow = null
-    })
+    return writeWindow
 }
 
 module.exports = createWriteWindow

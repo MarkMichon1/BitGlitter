@@ -22,9 +22,7 @@ function createPresetsWindow (isDev) {
         require('electron').shell.openExternal(url);
     })
 
-    presetsWindow.on('ready', () => {
-        presetsWindow = null
-    })
+    return presetsWindow
 }
 
 module.exports = createPresetsWindow

@@ -1,6 +1,26 @@
+const axios = require('axios')
+const { ipcRenderer, remote } = require('electron')
+
+let bitLengthValue = 0
+let colorLength = 0
+const slider = document.getElementById('bit-length-range')
+const bitLengthValueElement = document.getElementById('bit-length-value')
+const colorLengthValueElement = document.getElementById('color-length-value')
+
+slider.addEventListener('input', () => {
+    bitLengthValue = slider.value
+    colorLength = 2 ** bitLengthValue
+    bitLengthValueElement.textContent = bitLengthValue
+    colorLengthValueElement.textContent = colorLength
+})
+
+
+
+
+
+
+
 /*
-todo:  this will probably be merged with another module
-todo: disallow exporting default paletteOverview with b64
 Returned validation values:
 Name
     taken: This palette name is already taken, please choose another
@@ -17,11 +37,5 @@ Color Set
     range: For each RGB value, it must be an integer between 0 and 255
     distance: Cannot have two identical colors in a color set
 
-
-B64 validation errors
-    invalid: Corrupt or incomplete string
-    invalid2: Nice try ;)
-    exists:  This palette already exists locally
-    name: Palette with this name already exists
 
  */

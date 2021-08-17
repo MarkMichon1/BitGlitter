@@ -23,9 +23,7 @@ function createAboutWindow (isDev) {
         require('electron').shell.openExternal(url);
     })
 
-    aboutWindow.on('ready', () => {
-        aboutWindow = null
-    })
+    return aboutWindow
 }
 
 module.exports = createAboutWindow

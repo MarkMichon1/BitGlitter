@@ -10,7 +10,12 @@
 </head>
 <body data-set-preferred-mode-onload="true">
     <div class="container">
-        b64 placeholder
+        <textarea class="form-control mt-20" id="input-box" placeholder="Paste share code here"></textarea>
+        <div class="mt-20">
+            <button class="btn" id="close-button" type="button">Cancel</button>
+            <button class="btn btn-success ml-15 mr-15" id="import-button" disabled="disabled" type="button">Import</button>
+            <span class="text-danger" id="status-text"></span>
+        </div>
     </div>
 </body>
 </html>

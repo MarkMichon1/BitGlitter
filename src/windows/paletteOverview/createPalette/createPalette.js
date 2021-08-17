@@ -20,11 +20,9 @@ function createCreatePaletteWindow (isDev) {
     }
 
     createPaletteWindow.loadFile(`${__dirname}/createPalette.html`)
-    createPaletteWindow.setMenu(null)
+    // createPaletteWindow.setMenu(null)
 
-    createPaletteWindow.on('ready', () => {
-        createPaletteWindow = null
-    })
+    return createPaletteWindow
 }
 
 module.exports = createCreatePaletteWindow

@@ -28,9 +28,7 @@ function createStatisticsWindow (isDev) {
         require('electron').shell.openExternal(url);
     })
 
-    statisticsWindow.on('ready', () => {
-        statisticsWindow = null
-    })
+    return statisticsWindow
 }
 
 module.exports = createStatisticsWindow

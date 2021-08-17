@@ -22,9 +22,7 @@ function createUserGuideWindow (isDev) {
         require('electron').shell.openExternal(url);
     })
 
-    userGuideWindow.on('ready', () => {
-        userGuideWindow = null
-    })
+    return userGuideWindow
 }
 
 module.exports = createUserGuideWindow
