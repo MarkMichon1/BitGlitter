@@ -1,13 +1,15 @@
 const { BrowserWindow } = require('electron')
 
-function createWriteWindow (isDev) {
+function createWriteWindow (isDev, parentWindow) {
     let writeWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Write Stream',
         width: 800,
         height: 625,
         resizable: isDev,
-        icon: './assets/icons/icon.png'
+        icon: './assets/icons/icon.png',
+        parent: parentWindow,
+        modal: true
     })
 
     if (isDev) {

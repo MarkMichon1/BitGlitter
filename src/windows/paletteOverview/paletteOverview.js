@@ -2,7 +2,7 @@ const { BrowserWindow, ipcMain} = require('electron')
 const createCreatePaletteWindow = require('./createPalette/createPalette')
 const createBase64ImportWindow = require('./b64Import/b64Import')
 
-function createPaletteOverviewWindow (isDev) {
+function createPaletteOverviewWindow (isDev, parentWindow) {
     let paletteOverviewWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Palettes',
@@ -10,12 +10,17 @@ function createPaletteOverviewWindow (isDev) {
         height: 625,
         resizable: isDev,
         icon: './assets/icons/icon.png',
+        parent: parentWindow,
+        modal: true,
         webPreferences: {
             contextIsolation: false,
             enableRemoteModule: true,
             nodeIntegration: true
         }
     })
+
+    let createPaletteWindow = null
+    let importPaletteWindow = null
 
     if (isDev) {
         paletteOverviewWindow.webContents.openDevTools()

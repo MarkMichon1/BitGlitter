@@ -1,13 +1,15 @@
 const { BrowserWindow } = require('electron')
 
-function createSavedStreamsWindow (isDev) {
+function createSavedStreamsWindow (isDev, parentWindow) {
     let savedStreamsWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Saved Streams',
         width: 800,
         height: 625,
         resizable: isDev,
-        icon: './assets/icons/icon.png'
+        icon: './assets/icons/icon.png',
+        parent: parentWindow,
+        modal: true
     })
 
     if (isDev) {

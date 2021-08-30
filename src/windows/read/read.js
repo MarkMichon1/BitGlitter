@@ -1,13 +1,15 @@
 const { BrowserWindow } = require('electron')
 
-function createReadWindow (isDev) {
+function createReadWindow (isDev, parentWindow) {
     let readWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Read Stream',
         width: 800,
         height: 625,
         resizable: isDev,
-        icon: './assets/icons/icon.png'
+        icon: './assets/icons/icon.png',
+        parent: parentWindow,
+        modal: true
     })
 
     if (isDev) {

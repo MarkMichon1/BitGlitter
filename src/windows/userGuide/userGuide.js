@@ -1,12 +1,14 @@
 const { BrowserWindow } = require('electron')
 
-function createUserGuideWindow (isDev) {
+function createUserGuideWindow (isDev, parentWindow) {
     let userGuideWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'User Manual',
         width: 800,
         height: 625,
-        icon: './assets/icons/icon.png'
+        icon: './assets/icons/icon.png',
+        parent: parentWindow,
+        modal: true
     })
 
     if (isDev) {

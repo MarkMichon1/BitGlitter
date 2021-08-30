@@ -1,6 +1,6 @@
 const { BrowserWindow } = require('electron')
 
-function createStatisticsWindow (isDev) {
+function createStatisticsWindow (isDev, parentWindow) {
     let statisticsWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Statistics',
@@ -8,6 +8,8 @@ function createStatisticsWindow (isDev) {
         height: 430,
         resizable: isDev,
         icon: './assets/icons/icon.png',
+        parent: parentWindow,
+        modal: true,
         webPreferences: {
             contextIsolation: false,
             enableRemoteModule: true,

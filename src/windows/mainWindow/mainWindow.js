@@ -9,20 +9,32 @@ const createSettingsWindow = require('../settings/settings')
 const createStatisticsWindow = require('../statistics/statistics')
 const createUserGuideWindow = require('../userGuide/userGuide')
 const createWriteWindow = require('../write/write')
+const WindowManager = require('../../utilities/windowManager')
 
 function createMainWindow (isDev) {
     let mainWindow = new BrowserWindow({
         backgroundColor: '#25282C',
-        title: 'BitGlitter v1.0',
+        title: 'BitGlitter v0.7 Alpha',
         width: 800,
         height: 625,
         resizable: isDev,
         icon: './assets/icons/icon.png',
+        darkTheme: true,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
         }
     })
+
+    const writeWindow = new WindowManager(createWriteWindow, isDev, mainWindow)
+    const readWindow = new WindowManager(createReadWindow, isDev, mainWindow)
+    const savedStreamWindow = new WindowManager(createSavedStreamsWindow, isDev, mainWindow)
+    const paletteOverviewWindow = new WindowManager(createPaletteOverviewWindow, isDev, mainWindow)
+    const settingsWindow = new WindowManager(createSettingsWindow, isDev, mainWindow)
+    const statisticsWindow = new WindowManager(createStatisticsWindow, isDev, mainWindow)
+    const userGuideWindow = new WindowManager(createUserGuideWindow, isDev, mainWindow)
+    const aboutWindow = new WindowManager(createAboutWindow, isDev, mainWindow)
+
 
     const menu = [
         {
@@ -31,17 +43,17 @@ function createMainWindow (isDev) {
                 {
                     label: 'Write Stream',
                     accelerator: 'Ctrl+W',
-                    click: () => writeWindow = createWriteWindow(isDev)
+                    click: () => writeWindow.click()
                 },
                 {
                     label: 'Read Stream',
                     accelerator: !isDev ? 'Ctrl+R' : 'Ctrl+T',
-                    click: () => readWindow = createReadWindow(isDev)
+                    click: () => readWindow.click()
                 },
                 {
                     label: 'Saved Streams',
                     accelerator: 'Ctrl+S',
-                    click: () => savedStreamWindow = createSavedStreamsWindow(isDev)
+                    click: () => savedStreamWindow.click()
                 },
                 {
                   type: 'separator'
@@ -58,7 +70,7 @@ function createMainWindow (isDev) {
                 {
                     label: 'Palettes',
                     accelerator: 'Ctrl+P',
-                    click: () => paletteOverviewWindow = createPaletteOverviewWindow(isDev)
+                    click: () => paletteOverviewWindow.click()
                 },
                 // {
                 //     label: 'Presets',
@@ -66,14 +78,14 @@ function createMainWindow (isDev) {
                 // },
                 {
                     label: 'Settings',
-                    click: () => settingsWindow = createSettingsWindow(isDev)
+                    click: () => settingsWindow.click()
                 },
                 {
                     type: 'separator'
                 },
                 {
                     label: 'Statistics',
-                    click: () => statisticsWindow = createStatisticsWindow(isDev)
+                    click: () => statisticsWindow.click()
                 }
             ]
         },
@@ -83,7 +95,7 @@ function createMainWindow (isDev) {
                 {
                     label: 'User Guide',
                     accelerator: 'Ctrl+G',
-                    click: () => userGuideWindow = createUserGuideWindow(isDev)
+                    click: () => userGuideWindow.click()
                 },
                 {
                     type: 'separator'
@@ -101,7 +113,7 @@ function createMainWindow (isDev) {
                 },
                 {
                     label: 'About BitGlitter',
-                    click: () => aboutWindow = createAboutWindow(isDev)
+                    click: () => aboutWindow.click()
                 },
             ]
         },

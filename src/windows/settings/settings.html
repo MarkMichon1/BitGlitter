@@ -15,19 +15,29 @@
         <tbody>
         <tr>
             <th>
-            <span data-toggle="tooltip" data-title="Where created streams will be saved">
-                <i class="bi bi-question-circle blue"></i>
-            </span>  Stream output directory path
+                <span data-toggle="tooltip" data-title="Where created streams will be saved">
+                    <i class="bi bi-question-circle blue"></i>
+                </span>  (Write) Stream output directory path
             </th>
-            <td class="text-right"><input type="file" webkitdirectory /></td>
+            <td class="text-right">
+                <div>
+                    <button class="btn btn-primary" type="button" id="write-output-dir-button">Change directory</button>
+                </div>
+                <div id="write-output-dir-path"></div>
+            </td>
         </tr>
         <tr>
             <th>
             <span data-toggle="tooltip" data-title="Where files decoded from streams will be saved">
                 <i class="bi bi-question-circle blue"></i>
-            </span>  Decoded files directory path
+            </span>  (Read) Decoded files directory path
             </th>
-            <td class="text-right"><input type="file" webkitdirectory /></td>
+            <td class="text-right">
+                <div>
+                    <button class="btn btn-primary" type="button" id="read-output-dir-button">Change directory</button>
+                </div>
+                <div id="read-output-dir-path"></div>
+            </td>
         </tr>
         <tr>
             <th>
@@ -91,11 +101,16 @@
                 <i class="bi bi-question-circle blue"></i>
             </span>  (Dev) Logging output directory path
             </th>
-            <td class="text-right"><input type="file" webkitdirectory /></td>
+            <td class="text-right">
+                <div>
+                    <button class="btn btn-primary" type="button" id="logging-output-dir-button">Change directory</button>
+                </div>
+                <div id="logging-output-dir-path"></div>
+            </td>
         </tr>
         <tr>
-            <th><button class="btn btn-primary" type="button">Save</button>
-                <button class="btn ml-20" type="button">Cancel</button></th>
+            <th><button class="btn btn-primary" type="button" id="save-button">Save</button>
+                <button class="btn ml-20" type="button" id="cancel-button">Cancel</button></th>
             <td class="text-right"></td>
         </tr>
         </tbody>

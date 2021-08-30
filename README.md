@@ -1,6 +1,12 @@
 ![BitGlitter Logo](https://i.imgur.com/pX8b4Dy.png)
 
-# BitGlitter
+# Electron Desktop App (you are here) | [Python Backend For App](https://github.com/MarkMichon1/BitGlitter-Backend) | [Python Library](https://github.com/MarkMichon1/BitGlitter-Python)
+
+## Store and transfer files using high-performance animated barcodes ⚡
+
+![BitGlitter Sample GIF](https://i.imgur.com/lPFR5kA.gif)
+
+**[Discord Server](https://discord.gg/t9uv2pZ)**
 
 This is the repo for the BitGlitter desktop app.  It is an ElectronJS powered frontend, communicating with [BitGlitter-Backend](https://github.com/MarkMichon1/BitGlitter-Backend) to access core functionality.
 

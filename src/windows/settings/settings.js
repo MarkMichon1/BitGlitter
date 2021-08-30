@@ -4,7 +4,7 @@ const { BrowserWindow } = require('electron')
 include option for outputting stream SHA or stream name
  */
 
-function createSettingsWindow (isDev) {
+function createSettingsWindow (isDev, parentWindow) {
     let settingsWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Settings',
@@ -12,6 +12,8 @@ function createSettingsWindow (isDev) {
         height: 625,
         resizable: isDev,
         icon: './assets/icons/icon.png',
+        parent: parentWindow,
+        modal: true,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
