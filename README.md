@@ -8,6 +8,8 @@
 
 **[Discord Server](https://discord.gg/t9uv2pZ)**
 
+**[Youtube video of a real stream transferring ~80KB/s of data](https://youtu.be/TIKEEA2mXrI)**
+
 This is the repo for the BitGlitter desktop app.  It is an ElectronJS powered frontend, communicating with [BitGlitter-Backend](https://github.com/MarkMichon1/BitGlitter-Backend) to access core functionality.
 
 More will be added as this nears completion. 👍

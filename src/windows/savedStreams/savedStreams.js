@@ -14,10 +14,11 @@ function createSavedStreamsWindow (isDev, parentWindow) {
 
     if (isDev) {
         savedStreamsWindow.webContents.openDevTools()
+    } else {
+        savedStreamsWindow.setMenu(null)
     }
 
     savedStreamsWindow.loadFile(`${__dirname}/savedStreams.html`)
-    savedStreamsWindow.setMenu(null)
 
     // External links open in browser rather than in app
     savedStreamsWindow.webContents.on('new-window', function(e, url) {

@@ -22,10 +22,11 @@ function createSettingsWindow (isDev, parentWindow) {
 
     if (isDev) {
         settingsWindow.webContents.openDevTools()
+    } else {
+        settingsWindow.setMenu(null)
     }
 
     settingsWindow.loadFile(`${__dirname}/settings.html`)
-    // settingsWindow.setMenu(null)
 
     // External links open in browser rather than in app
     settingsWindow.webContents.on('new-window', function(e, url) {

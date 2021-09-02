@@ -14,7 +14,7 @@ const WindowManager = require('../../utilities/windowManager')
 function createMainWindow (isDev) {
     let mainWindow = new BrowserWindow({
         backgroundColor: '#25282C',
-        title: 'BitGlitter v0.7 Alpha',
+        title: 'BitGlitter v1.0',
         width: 800,
         height: 625,
         resizable: isDev,
@@ -133,7 +133,9 @@ function createMainWindow (isDev) {
                     },
                     {
                         label: 'Reset Flask Executable',
-                        click: () => {}
+                        click: () => {
+                            console.log('Placeholder')
+                        }
                     },
                 ]
             },

@@ -45,7 +45,7 @@
                 <i class="bi bi-question-circle blue"></i>
             </span>  Enable bad frame strikes
             </th>
-            <td class="text-right"><input type="checkbox" id=""></td>
+            <td class="text-right"><input type="checkbox" id="enable-frame-strikes"></td>
         </tr>
         <tr>
             <th>
@@ -53,7 +53,7 @@
                 <i class="bi bi-question-circle blue"></i>
             </span>  Bad frame strikes
             </th>
-            <td class="text-right"><input type="number" min="1"></td>
+            <td class="text-right"><input type="number" min="1" id="frame-strike-count"></td>
         </tr>
         <tr>
             <th>
@@ -61,7 +61,7 @@
                 <i class="bi bi-question-circle blue"></i>
             </span>  Maximum CPU cores
             </th>
-            <td class="text-right"><input type="range" min="1" max="1" step="1"><span class="ml-20">0</span></td>
+            <td class="text-right"><input type="range" min="1" max="1" step="1" id="cpu-core-slider"><span class="ml-20" id="cpu-core-count">0</span></td>
         </tr>
         <tr>
             <th>
@@ -69,7 +69,7 @@
                 <i class="bi bi-question-circle blue"></i>
             </span>  Enable statistics
             </th>
-            <td class="text-right"><input type="checkbox" id=""></td>
+            <td class="text-right"><input type="checkbox" id="enable-statistics"></td>
         </tr>
         <tr>
             <th>
@@ -77,37 +77,37 @@
                 <i class="bi bi-question-circle blue"></i>
             </span>  Output stream name in write
             </th>
-            <td class="text-right"><input type="checkbox" id=""></td>
+            <td class="text-right"><input type="checkbox" id="enable-stream-name"></td>
         </tr>
-        <tr>
-            <th>
-            <span data-toggle="tooltip" data-title="Output logging messages to text files during read and write">
-                <i class="bi bi-question-circle blue"></i>
-            </span>  (Dev) Enable logging
-            </th>
-            <td class="text-right"><input type="checkbox" id=""></td>
-        </tr>
-        <tr>
-            <th>
-            <span data-toggle="tooltip" data-title="Include more internal state messages when running">
-                <i class="bi bi-question-circle blue"></i>
-            </span>  (Dev) Enable debug in logging messages
-            </th>
-            <td class="text-right"><input type="checkbox" id="agree-to-terms"></td>
-        </tr>
-        <tr>
-            <th>
-            <span data-toggle="tooltip" data-title="Where logging messages will be saved">
-                <i class="bi bi-question-circle blue"></i>
-            </span>  (Dev) Logging output directory path
-            </th>
-            <td class="text-right">
-                <div>
-                    <button class="btn btn-primary" type="button" id="logging-output-dir-button">Change directory</button>
-                </div>
-                <div id="logging-output-dir-path"></div>
-            </td>
-        </tr>
+<!--        <tr>-->
+<!--            <th>-->
+<!--            <span data-toggle="tooltip" data-title="Output logging messages to text files during read and write">-->
+<!--                <i class="bi bi-question-circle blue"></i>-->
+<!--            </span>  (Dev) Enable logging-->
+<!--            </th>-->
+<!--            <td class="text-right"><input type="checkbox" id=""></td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--            <th>-->
+<!--            <span data-toggle="tooltip" data-title="Include more internal state messages when running">-->
+<!--                <i class="bi bi-question-circle blue"></i>-->
+<!--            </span>  (Dev) Enable debug in logging messages-->
+<!--            </th>-->
+<!--            <td class="text-right"><input type="checkbox" id="agree-to-terms"></td>-->
+<!--        </tr>-->
+<!--        <tr>-->
+<!--            <th>-->
+<!--            <span data-toggle="tooltip" data-title="Where logging messages will be saved">-->
+<!--                <i class="bi bi-question-circle blue"></i>-->
+<!--            </span>  (Dev) Logging output directory path-->
+<!--            </th>-->
+<!--            <td class="text-right">-->
+<!--                <div>-->
+<!--                    <button class="btn btn-primary" type="button" id="logging-output-dir-button">Change directory</button>-->
+<!--                </div>-->
+<!--                <div id="logging-output-dir-path"></div>-->
+<!--            </td>-->
+<!--        </tr>-->
         <tr>
             <th><button class="btn btn-primary" type="button" id="save-button">Save</button>
                 <button class="btn ml-20" type="button" id="cancel-button">Cancel</button></th>

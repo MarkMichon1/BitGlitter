@@ -12,6 +12,8 @@ function createPresetsWindow (isDev) {
 
     if (isDev) {
         presetsWindow.webContents.openDevTools()
+    } else {
+        presetsWindow.setMenu(null)
     }
 
     presetsWindow.loadFile(`${__dirname}/presets.html`)

@@ -1,6 +1,8 @@
 const { BrowserWindow, ipcMain} = require('electron')
 const createCreatePaletteWindow = require('./createPalette/createPalette')
 const createBase64ImportWindow = require('./b64Import/b64Import')
+const WindowManager = require('../../utilities/windowManager')
+const {log} = require("nodemon/lib/utils");
 
 function createPaletteOverviewWindow (isDev, parentWindow) {
     let paletteOverviewWindow = new BrowserWindow({
@@ -19,26 +21,27 @@ function createPaletteOverviewWindow (isDev, parentWindow) {
         }
     })
 
-    let createPaletteWindow = null
-    let importPaletteWindow = null
+    const createPaletteWindow = new WindowManager(createCreatePaletteWindow, isDev, paletteOverviewWindow)
+    const importPaletteWindow = new WindowManager(createBase64ImportWindow, isDev, paletteOverviewWindow)
 
     if (isDev) {
         paletteOverviewWindow.webContents.openDevTools()
+    } else {
+        paletteOverviewWindow.setMenu(null)
     }
 
     paletteOverviewWindow.loadFile(`${__dirname}/paletteOverview.html`)
-    // paletteOverviewWindow.setMenu(null)
 
+    // Events
     ipcMain.on('importPalette', (event, options) => {
         paletteOverviewWindow.webContents.send('createdPalette', options)
     })
 
+    ipcMain.on('openCreatePaletteWindow', () => createPaletteWindow.click())
+
+    ipcMain.on('openImportPaletteWindow', () => importPaletteWindow.click())
+
     return paletteOverviewWindow
 }
-
-// Events
-ipcMain.on('openCreatePaletteWindow', createCreatePaletteWindow)
-
-ipcMain.on('openImportPaletteWindow', createBase64ImportWindow)
 
 module.exports = createPaletteOverviewWindow

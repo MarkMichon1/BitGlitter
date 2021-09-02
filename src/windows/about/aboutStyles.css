@@ -1,0 +1,31 @@
+span.about-block {
+    width: 28px;
+    height: 28px;
+    background-color: #FF7D2E;
+    animation-name: slow-spin;
+    animation-duration: 21s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    transform-origin: 50% 50%;
+    display: inline-block;
+    margin-right: 20px;
+}
+
+span.about-block:hover {
+    background-color: #FF9757;
+    cursor: pointer;
+}
+
+span.about-block:active {
+    background-color: #FFB181;
+    cursor: pointer;
+}
+
+@keyframes slow-spin  {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

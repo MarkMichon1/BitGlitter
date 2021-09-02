@@ -13,10 +13,11 @@ function createUserGuideWindow (isDev, parentWindow) {
 
     if (isDev) {
         userGuideWindow.webContents.openDevTools()
+    } else {
+        userGuideWindow.setMenu(null)
     }
 
     userGuideWindow.loadFile(`${__dirname}/userGuide.html`)
-    userGuideWindow.setMenu(null)
 
     // External links open in browser rather than in app
     userGuideWindow.webContents.on('new-window', function(e, url) {

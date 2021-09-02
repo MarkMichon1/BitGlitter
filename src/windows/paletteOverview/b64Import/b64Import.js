@@ -1,6 +1,6 @@
 const { BrowserWindow } = require('electron')
 
-function createBase64ImportWindow (isDev) {
+function createBase64ImportWindow (isDev, parentWindow) {
     let base64ImportWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Import Palette',
@@ -8,6 +8,8 @@ function createBase64ImportWindow (isDev) {
         height: 200,
         resizable: isDev,
         icon: '',
+        parent: parentWindow,
+        modal: true,
         webPreferences: {
             contextIsolation: false,
             enableRemoteModule: true,
@@ -17,10 +19,11 @@ function createBase64ImportWindow (isDev) {
 
     if (isDev) {
         base64ImportWindow.webContents.openDevTools()
+    } else {
+        base64ImportWindow.setMenu(null)
     }
 
     base64ImportWindow.loadFile(`${__dirname}/b64Import.html`)
-    base64ImportWindow.setMenu(null)
 
     return base64ImportWindow
 }

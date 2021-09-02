@@ -14,10 +14,11 @@ function createReadWindow (isDev, parentWindow) {
 
     if (isDev) {
         readWindow.webContents.openDevTools()
+    } else {
+        readWindow.setMenu(null)
     }
 
     readWindow.loadFile(`${__dirname}/read.html`)
-    readWindow.setMenu(null)
 
     // External links open in browser rather than in app
     readWindow.webContents.on('new-window', function(e, url) {

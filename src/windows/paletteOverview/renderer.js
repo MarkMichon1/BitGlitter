@@ -66,8 +66,8 @@ const generateSampleFrames = async (activeCurrentPalette) => {
 }
 
 const closeWindowButtonHandler = () => {
-    let window = remote.getCurrentWindow();
-    window.close();
+    let window = remote.getCurrentWindow()
+    window.close()
 }
 
 const deleteButton = document.getElementById("delete-button")
@@ -76,16 +76,15 @@ const deletePaletteButtonHandler = () => {
     if (activePalette.is_custom) {
         if (!deletePaletteAreYouSure) {
             deleteButton.textContent = 'You sure?'
+            deletePaletteAreYouSure = true
         } else {
-            // sends request via api to delete
-            axios.post('http://localhost:7218/palettes', {'palette_id': activePalette.palette_id}).then((response) =>
+            axios.post('http://localhost:7218/palettes/remove', {'palette_id': activePalette.palette_id}).then((response) =>
                 {
-                    console.log('ok')
+                    paletteList = paletteList.filter(item => item.palette_id !== activePalette.palette_id)
+                    activePaletteLi.remove()
+                    loadFirstPalette()
                 }
             )
-            // removes from palette list
-            // removes event listener
-            // makes palette[0] active
         }
     }
 }
@@ -100,10 +99,6 @@ const importPaletteButtonHandler = () => {
 }
 
 const loadActivePalette = (activePalette) => {
-    // Remove old event listeners
-
-    // Add new event listeners
-
     // Render content
     activePaletteName.textContent = activePalette.name
     activePaletteDescription.textContent = activePalette.description
@@ -157,10 +152,15 @@ const sortPaletteList = () => {
     })
 }
 
+const onPaletteSelect = (palette, paletteLi) => {
+
+}
+
 const renderPalette = (palette) => {
     let newLi = document.createElement('li')
     newLi.setAttribute('palette-id', palette.palette_id)
     newLi.addEventListener('click', () => {
+        onPaletteSelect() ///////////////////////////////////////////
         if (activePaletteLi){
             activePaletteLi.classList.remove('active')
         }
@@ -180,6 +180,14 @@ const renderPalette = (palette) => {
     paletteListElement.appendChild(newLi)
 }
 
+const loadFirstPalette = () => {
+    activePalette = paletteList[0]
+    loadActivePalette(activePalette)
+    generateSampleFrames(activePalette)
+    activePaletteLi = document.querySelector('[palette-id="1"]')
+    activePaletteLi.classList.add('active')
+}
+
 
 const refreshPaletteList = initial => {
     axios.get('http://localhost:7218/palettes').then((response) => {
@@ -190,11 +198,7 @@ const refreshPaletteList = initial => {
         })
 
         if (initial) {
-            activePalette = paletteList[0]
-            loadActivePalette(activePalette)
-            generateSampleFrames(activePalette)
-            activePaletteLi = document.querySelector('[palette-id="1"]')
-            activePaletteLi.classList.add('active')
+            loadFirstPalette()
         }
     })
 }

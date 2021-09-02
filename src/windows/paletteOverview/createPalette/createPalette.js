@@ -1,6 +1,6 @@
 const { BrowserWindow } = require('electron')
 
-function createCreatePaletteWindow (isDev) {
+function createCreatePaletteWindow (isDev, parentWindow) {
     let createPaletteWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Create Palette',
@@ -8,6 +8,8 @@ function createCreatePaletteWindow (isDev) {
         height: 430,
         resizable: isDev,
         icon: '',
+        parent: parentWindow,
+        modal: true,
         webPreferences: {
             contextIsolation: false,
             enableRemoteModule: true,
@@ -17,10 +19,11 @@ function createCreatePaletteWindow (isDev) {
 
     if (isDev) {
         createPaletteWindow.webContents.openDevTools()
+    } else {
+        createPaletteWindow.setMenu(null)
     }
 
     createPaletteWindow.loadFile(`${__dirname}/createPalette.html`)
-    // createPaletteWindow.setMenu(null)
 
     return createPaletteWindow
 }

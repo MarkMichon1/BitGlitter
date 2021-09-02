@@ -14,10 +14,11 @@ function createWriteWindow (isDev, parentWindow) {
 
     if (isDev) {
         writeWindow.webContents.openDevTools()
+    } else {
+        writeWindow.setMenu(null)
     }
 
     writeWindow.loadFile(`${__dirname}/write.html`)
-    writeWindow.setMenu(null)
 
     // External links open in browser rather than in app
     writeWindow.webContents.on('new-window', function(e, url) {
