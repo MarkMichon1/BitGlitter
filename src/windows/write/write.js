@@ -30,3 +30,5 @@ function createWriteWindow (isDev, parentWindow) {
 }
 
 module.exports = createWriteWindow
+
+//https://www.electronjs.org/docs/api/dialog

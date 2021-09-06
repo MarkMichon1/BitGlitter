@@ -4,7 +4,7 @@ const createBase64ImportWindow = require('./b64Import/b64Import')
 const WindowManager = require('../../utilities/windowManager')
 const {log} = require("nodemon/lib/utils");
 
-function createPaletteOverviewWindow (isDev, parentWindow) {
+function createPaletteOverviewWindow (isDev, parentWindow, firstRun) {
     let paletteOverviewWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Palettes',
@@ -33,13 +33,15 @@ function createPaletteOverviewWindow (isDev, parentWindow) {
     paletteOverviewWindow.loadFile(`${__dirname}/paletteOverview.html`)
 
     // Events
-    ipcMain.on('importPalette', (event, options) => {
-        paletteOverviewWindow.webContents.send('createdPalette', options)
-    })
+    if (firstRun) {
+        ipcMain.on('importPalette', (event, options) => {
+            paletteOverviewWindow.webContents.send('createdPalette', options)
+        })
 
-    ipcMain.on('openCreatePaletteWindow', () => createPaletteWindow.click())
+        ipcMain.on('openCreatePaletteWindow', () => createPaletteWindow.click())
 
-    ipcMain.on('openImportPaletteWindow', () => importPaletteWindow.click())
+        ipcMain.on('openImportPaletteWindow', () => importPaletteWindow.click())
+    }
 
     return paletteOverviewWindow
 }

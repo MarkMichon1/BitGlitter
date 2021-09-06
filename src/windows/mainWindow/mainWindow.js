@@ -78,7 +78,9 @@ function createMainWindow (isDev) {
                 // },
                 {
                     label: 'Settings',
-                    click: () => settingsWindow.click()
+                    click: () => {
+                        settingsWindow.click()
+                    }
                 },
                 {
                     type: 'separator'
@@ -153,6 +155,10 @@ function createMainWindow (isDev) {
         e.preventDefault();
         require('electron').shell.openExternal(url);
     })
+
+    ipcMain.on('openWriteWindow', () => writeWindow.click())
+    ipcMain.on('openReadWindow', () => readWindow.click())
+    ipcMain.on('openSavedStreamWindow', () => savedStreamWindow.click())
 
     return mainMenu
 }

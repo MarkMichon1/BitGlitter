@@ -13,3 +13,7 @@
 textarea {
     resize: none;
 }
+
+.hidden {
+    visibility: hidden;
+}

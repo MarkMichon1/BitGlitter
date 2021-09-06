@@ -10,8 +10,18 @@
 </head>
 <body data-set-preferred-mode-onload="true">
 <div class="container">
+    <h1>Create Palette</h1>
     <div>
-        <textarea class="form-control mt-20" id="input-box" placeholder="Paste share code here"></textarea>
+        <input type="text" class="form-control" placeholder="Palette Name" id="name-input">
+        <p class="hidden" id="name-status"><span id="name-length">0</span>/50</p>
+        <input type="text" class="form-control" placeholder="Palette Description" id="description-input">
+        <p class="hidden" id="description-status"><span id="description-length">0</span>/100</p>
+        <textarea class="form-control mt-20" id="color-set-input" placeholder="Add color set using this format: (0,0,0), (255,255,0), (0,255,255), (255,0,255)"></textarea>
+        <p class="hidden" id="color-set-status">s</p>
+        <div class="mt-20">
+            <button class="btn" id="cancel-button" type="button">Cancel</button>
+            <button class="btn btn-success ml-15 mr-15" id="add-button" disabled="disabled" type="button">Add Palette</button>
+        </div>
     </div>
 </div>
 </body>

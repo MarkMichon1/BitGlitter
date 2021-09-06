@@ -1,3 +1,5 @@
+const { ipcRenderer } = require('electron')
+
 const getRandomInt = (min, max) => {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -23,3 +25,11 @@ for (const block of logoBackgroundBlocks) {
     block.classList.add(`logo-speed-${newInt}`)
     lastInt = newInt
 }
+
+const writeButton = document.getElementById('write-button')
+const readButton = document.getElementById('read-button')
+const savedStreamButton = document.getElementById('saved-stream-button')
+
+writeButton.addEventListener('click', () => ipcRenderer.send('openWriteWindow'))
+readButton.addEventListener('click', () => ipcRenderer.send('openReadWindow'))
+savedStreamButton.addEventListener('click', () => ipcRenderer.send('openSavedStreamWindow'))

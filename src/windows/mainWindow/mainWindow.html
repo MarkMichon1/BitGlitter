@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="../../../assets/css/helperClasses.css">
     <link rel="stylesheet" href="mainWindowStyle.css">
     <script src="../../../assets/js/halfmoon.min.js" defer></script>
-    <script src="stylerandom.js" defer></script>
+    <script src="renderer.js" defer></script>
 </head>
 <body data-set-preferred-mode-onload="true">
 <div class="bg-container">
@@ -1274,9 +1274,9 @@
     </div>
 </div>
 <div class="button-container no-select">
-    <p><button class="btn btn-main" type="button">Create Stream</button></p>
-    <p><button class="btn btn-main" type="button">Read Stream</button></p>
-    <p><button class="btn" type="button menu-button">Saved Streams</button></p>
+    <p><button class="btn btn-main" type="button" id="write-button">Create Stream</button></p>
+    <p><button class="btn btn-main" type="button" id="read-button">Read Stream</button></p>
+    <p><button class="btn" type="button menu-button" id="saved-stream-button">Saved Streams</button></p>
 </div>
 <div class="container">
     <div class="alert no-select" role="alert">
