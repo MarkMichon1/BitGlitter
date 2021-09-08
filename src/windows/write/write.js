@@ -9,7 +9,12 @@ function createWriteWindow (isDev, parentWindow) {
         resizable: isDev,
         icon: './assets/icons/icon.png',
         parent: parentWindow,
-        modal: true
+        modal: true,
+        webPreferences: {
+            contextIsolation: false,
+            enableRemoteModule: true,
+            nodeIntegration: true
+        }
     })
 
     if (isDev) {
