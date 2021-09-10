@@ -21,3 +21,11 @@ textarea {
 .no-display {
     display: none;
 }
+
+.progress {
+    height: 15px;
+}
+
+.progress-bar {
+    height: 15px;
+}

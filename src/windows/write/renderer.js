@@ -1,7 +1,8 @@
 const axios = require('axios')
 const { ipcRenderer, remote } = require('electron')
+const io = require("socket.io-client");
 const {log} = require("nodemon/lib/utils");
-
+console.log(io)
 /*
     *** Setup Variables ***
 */
@@ -87,7 +88,7 @@ const stepFourSegmentLoad = () => {
 }
 const stepFiveSegmentLoad = () => {
     currentStep = 5
-    stepTitle.textContent = 'Step 5/5 -- Rendering'
+    stepTitle.textContent = 'Step 5/5 -- Rendering...'
     stepFiveSegment.classList.remove('no-display')
     backButtonDisable()
     nextButtonDisable()
@@ -172,7 +173,7 @@ let descriptionValid = false
 /*
     *** Step 2/5 -- Stream Configuration ***
 */
-let writeMode = 'video'
+let writeModeVideo = true
 let compressedEnabled = true
 
 
@@ -200,13 +201,47 @@ let scryptP = 1
 /*
     *** Step 5/5 -- Rendering ***
 */
+const renderTextInfo = document.getElementById('render-text-info')
+const renderProgressBar = document.getElementById('render-progress-bar')
+
+const socket = io('ws://localhost:7218')
+
+let writeSavePath = null
+
 const writeStart = () => {
+    // axios.post() feed arguments into this
     console.log('Placeholder to start write')
 
-    //Write finished
-    // nextButtonEnable()
-    // nextButton.textContent = 'Finish'
 }
+
+socket.on('write-preprocess', data => {
+    // Displays some preprocess data prior to rendering
+    renderTextInfo.textContent = data
+})
+
+socket.on('write-render', data => {
+    // Displays frame render progress and manipulates progress bar
+    subdividedMessage = data.split('|')
+    renderTextInfo.textContent = `Generating frame ${subdividedMessage[0]}/${subdividedMessage[1]}...`
+})
+
+socket.on('write-video-render', data => {
+    // Displays frame render progress and manipulates progress bar
+    subdividedMessage = data.split('|')
+    renderTextInfo.textContent = `Rendering video frame ${subdividedMessage[0]}/${subdividedMessage[1]}...`
+})
+
+socket.on('write-save-path', data => {
+    writeSavePath = data
+
+})
+
+socket.on('write-done', data => {
+    // Signals write is complete
+    renderTextInfo.textContent = `Write Complete!  Your ${'video is' ? writeModeVideo : 'frames are'} available here: ${writeSavePath}`
+    nextButtonEnable()
+    nextButton.textContent = 'Finish'
+})
 
 backButton.addEventListener('click', () => backButtonHandler())
 nextButton.addEventListener('click', () => nextButtonHandler())

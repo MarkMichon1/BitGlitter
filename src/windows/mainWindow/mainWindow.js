@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, shell, ipcMain} = require('electron')
+const { app, BrowserWindow, Menu, nativeTheme, shell, ipcMain} = require('electron')
 
 const createAboutWindow = require('../about/about')
 const createPaletteOverviewWindow = require('../paletteOverview/paletteOverview')
@@ -25,7 +25,6 @@ function createMainWindow (isDev) {
             contextIsolation: false
         }
     })
-
     const writeWindow = new WindowManager(createWriteWindow, isDev, mainWindow)
     const readWindow = new WindowManager(createReadWindow, isDev, mainWindow)
     const savedStreamWindow = new WindowManager(createSavedStreamsWindow, isDev, mainWindow)
