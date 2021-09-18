@@ -10,9 +10,60 @@
 <body data-set-preferred-mode-onload="true">
 <div class="container no-select">
     <h1>Create BitGlitter Stream</h1>
-    <h2 id="step-title">Step 1/4 -- Basic Setup</h2>
-    <div id="step-one">
-        step 1
+    <h2 id="step-title"></h2>
+    <div class="no-display" id="step-zero">
+        <div class="alert alert-primary" role="alert">
+            <h4 class="alert-heading">So we're all on the same page:</h4>
+            <p>This is v1 of an experimental program, developed by one person.  While extensive testing has been
+                run on various use cases, some values for some options may break it.  In addition, it is not yet fully
+                optimized when rendering streams over several tens of megabytes when using the default write
+                configuration, resulting in relatively large outputs.  <strong>In this current version for maximum
+                stability, it is recommended to stick with the default write configuration, using smaller file sizes.</strong>
+            </p>
+            <p>Any found issues will be fixed as they are reported, and the app will continue to get refined over time.
+                Thanks for understanding! 👍</p>
+            <p><strong>This is the only time you'll see this.</strong></p>
+        </div>
+    </div>
+    <div class="no-display" id="step-one">
+        <table class="table">
+            <tbody>
+            <tr>
+                <th>
+                <span data-toggle="tooltip" data-title="Choose whether you're sending a single file, or a directory.">
+                    <i class="bi bi-question-circle blue"></i>
+                </span>  I am sending...
+                </th>
+                <td>
+                    <div>
+                        <div class="form-group">
+                            <div class="custom-radio">
+                                <input type="radio" name="input-type" id="radio-single-file" value="single-file" required="required">
+                                <label for="radio-single-file">A single file</label>
+                            </div>
+                            <div class="custom-radio">
+                                <input type="radio" name="input-type" id="radio-directory" value="directory" required="required">
+                                <label for="radio-directory">A directory</label>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                <span data-toggle="tooltip" data-title="Select which file or directory you wish to write.">
+                    <i class="bi bi-question-circle blue"></i>
+                </span>  Payload Select
+                </th>
+                <td class="text-right">
+                    <div>
+                        <button class="btn btn-primary" type="button" id="input-path-button" disabled="disabled">Select File/Directory</button>
+                    </div>
+                    <div id="input-path-display"></div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
     <div class="no-display" id="step-two">
         step 2

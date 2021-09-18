@@ -2,13 +2,13 @@ const axios = require('axios')
 const { ipcRenderer, remote } = require('electron')
 const io = require("socket.io-client");
 const {log} = require("nodemon/lib/utils");
-console.log(io)
 /*
     *** Setup Variables ***
 */
 
 const stepTitle = document.getElementById('step-title')
-
+// Step 0/5 and associated elements
+const stepZeroSegment = document.getElementById('step-zero')
 // Step 1/5 and associated elements
 const stepOneSegment = document.getElementById('step-one')
 // Step 2/5 and associated elements
@@ -24,11 +24,12 @@ const cancelButton = document.getElementById('cancel-button')
 const backButton = document.getElementById('back-button')
 const nextButton = document.getElementById('next-button')
 
-let stepOneValid = true  //TODO change to false
-let stepTwoValid = true
-let stepThreeValid = true
-let stepFourValid = true
-let stepFiveValid = true // Rendering complete
+let stepZeroValid = true
+let stepOneValid = false
+let stepTwoValid = false
+let stepThreeValid = false
+let stepFourValid = false
+let stepFiveValid = false // Signalling rendering complete
 let currentStep = null
 
 const validStringCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890._-'
@@ -49,11 +50,22 @@ const closeWindow = () => {
     currentWindow.close()
 }
 
+const stepZeroSegmentLoad = () => {
+    currentStep = 0
+    stepTitle.textContent = 'Before Continuing...'
+    backButtonDisable()
+    nextButtonEnable()
+    stepZeroSegment.classList.remove('no-display')
+}
 const stepOneSegmentLoad = () => {
     currentStep = 1
-    stepTitle.textContent = 'Step 1/5 -- Basic Setup'
+    stepTitle.textContent = 'Step 1/5 -- File/Folder Select'
     stepOneSegment.classList.remove('no-display')
-    backButtonDisable()
+    if (stepZeroValid) {
+        backButtonEnable()
+    } else {
+        backButtonDisable()
+    }
     if (stepOneValid) {
         nextButtonEnable()
     } else {
@@ -95,15 +107,19 @@ const stepFiveSegmentLoad = () => {
     nextButton.textContent = 'Rendering...'
 }
 
+const stepZeroSegmentHide = () => stepZeroSegment.classList.add('no-display')
 const stepOneSegmentHide = () => stepOneSegment.classList.add('no-display')
 const stepTwoSegmentHide = () => stepTwoSegment.classList.add('no-display')
 const stepThreeSegmentHide = () => stepThreeSegment.classList.add('no-display')
 const stepFourSegmentHide = () => stepFourSegment.classList.add('no-display')
-const stepFiveSegmentHide = () => stepFiveSegment.classList.add('no-display')
 
 
 const backButtonHandler = () => {
-    if (currentStep === 2) {
+    if (currentStep === 1 && stepZeroValid) {
+        stepOneSegmentHide()
+        stepZeroSegmentLoad()
+    }
+    else if (currentStep === 2) {
         stepTwoSegmentHide()
         stepOneSegmentLoad()
     } else if (currentStep === 3) {
@@ -116,22 +132,27 @@ const backButtonHandler = () => {
 }
 
 const nextButtonHandler = () => {
-    if (currentStep === 1 && stepOneValid) {
+    if (currentStep === 0) {
+        if (!stepZeroConfirmed) {
+            axios.post('http://localhost:7218/write/show-once').then(() => {
+                stepZeroConfirmed = true
+            })
+        }
+        stepZeroSegmentHide()
+        stepOneSegmentLoad()
+    }
+    else if (currentStep === 1 && stepOneValid) {
         stepOneSegmentHide()
         stepTwoSegmentLoad()
-        currentStep = 2
     } else if (currentStep === 2 && stepTwoValid) {
         stepTwoSegmentHide()
         stepThreeSegmentLoad()
-        currentStep = 3
     } else if (currentStep === 3 && stepThreeValid) {
         stepThreeSegmentHide()
         stepFourSegmentLoad()
-        currentStep = 4
     } else if (currentStep === 4 && stepFourValid) {
         stepFourSegmentHide()
         stepFiveSegmentLoad()
-        currentStep = 5
         writeStart()
     } else if (currentStep === 5 && stepFiveValid) {
         closeWindow()
@@ -156,18 +177,61 @@ const stepValidityChecker = (step) => {
     }
 }
 
+/*
+    *** Step 0/5 -- Show Once ***
+*/
+let stepZeroConfirmed = false
+
 
 /*
     *** Step 1/5 -- Basic Setup ***
 */
-//Stream name validate:  AZ, az, 09, ._-
-let inputPath = null
-let streamName = null
-let streamDescription = null
+const fileRadioButton = document.getElementById('radio-single-file')
+const directoryRadioButton = document.getElementById('radio-directory')
+const inputPathButton = document.getElementById('input-path-button')
+const inputPathDisplay = document.getElementById('input-path-display')
 
-let inputValid = false
-let nameValid = false
-let descriptionValid = false
+let inputType = null
+let inputPath = null
+
+const resetStepOneState = () => {
+    inputPath = null
+    inputPathDisplay.textContent = ''
+    inputPathButton.removeAttribute('disabled')
+    stepOneValidate()
+}
+
+fileRadioButton.addEventListener('change', () => {
+    inputType = 'file'
+    resetStepOneState()
+})
+directoryRadioButton.addEventListener('change', () => {
+    inputType = 'directory'
+    resetStepOneState()
+})
+
+inputPathButton.addEventListener('click', () => {
+    if (inputType) {
+        if (inputType === 'file') {
+            ipcRenderer.send('openFileSelectDialog')
+        } else if (inputType === 'directory') {
+            ipcRenderer.send('openDirectorySelectDialog')
+        }
+    }
+})
+
+ipcRenderer.on('updateWriteInput', (event, data) => {
+    console.log(data)
+    // spinny css loader
+    // post path to backend, then -> update file count/size
+})
+
+const stepOneValidate = () => {
+    if (inputType && inputPath) {
+        stepOneValid = true
+        nextButtonEnable()
+    }
+}
 
 
 /*
@@ -175,8 +239,14 @@ let descriptionValid = false
 */
 let writeModeVideo = true
 let compressedEnabled = true
+//Stream name validate:  AZ, az, 09, ._-
+
+let streamName = null
+let streamDescription = null
 
 
+let nameValid = false
+let descriptionValid = false
 /*
     *** Step 3/5 -- Render Configuration ***
 */
@@ -238,7 +308,7 @@ socket.on('write-save-path', data => {
 
 socket.on('write-done', data => {
     // Signals write is complete
-    renderTextInfo.textContent = `Write Complete!  Your ${'video is' ? writeModeVideo : 'frames are'} available here: ${writeSavePath}`
+    renderTextInfo.textContent = `Write Complete!  Your ${writeModeVideo ? 'video is' : 'frames are'} available here: ${writeSavePath}`
     nextButtonEnable()
     nextButton.textContent = 'Finish'
 })
@@ -247,5 +317,14 @@ backButton.addEventListener('click', () => backButtonHandler())
 nextButton.addEventListener('click', () => nextButtonHandler())
 cancelButton.addEventListener('click', () => closeWindow())
 
-// Loading first step
-stepOneSegmentLoad()
+// Loading first step, depending on whether the 'run once screen has previously appeared
+axios.get('http://localhost:7218/write/show-once').then((response) =>
+    {
+        stepZeroValid = !response.data.has_ran
+        if (stepZeroValid) {
+            stepZeroSegmentLoad()
+        } else {
+            stepOneSegmentLoad()
+        }
+    }
+)

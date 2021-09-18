@@ -2,7 +2,7 @@
 
 # Electron Desktop App (you are here) | [Python Backend For App](https://github.com/MarkMichon1/BitGlitter-Backend) | [Python Library](https://github.com/MarkMichon1/BitGlitter-Python)
 
-## Store and transfer files using high-performance animated barcodes ⚡
+## ⚡ Store and transfer files using high-performance animated barcodes
 
 ![BitGlitter Sample GIF](https://i.imgur.com/lPFR5kA.gif)
 

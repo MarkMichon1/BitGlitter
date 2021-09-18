@@ -1,4 +1,5 @@
-const { BrowserWindow } = require('electron')
+const { BrowserWindow, ipcMain, dialog} = require('electron')
+const path = require('path')
 
 function createWriteWindow (isDev, parentWindow) {
     let writeWindow = new BrowserWindow({
@@ -29,6 +30,40 @@ function createWriteWindow (isDev, parentWindow) {
     writeWindow.webContents.on('new-window', function(e, url) {
         e.preventDefault();
         require('electron').shell.openExternal(url);
+    })
+
+    ipcMain.on('openFileSelectDialog', (event) => {
+        dialog.showOpenDialog({
+            buttonLabel: 'Select File',
+            defaultPath : require('path').join(require('os').homedir(), 'Desktop'),
+            properties: [
+                'openFile'
+            ]
+        }).then((result) => {
+            console.log(result)
+            if (result.canceled === false) {
+                writeWindow.webContents.send('updateWriteInput', result.filePaths[0])
+            }
+        })
+    })
+
+    ipcMain.on('openDirectorySelectDialog', (event) => {
+        dialog.showOpenDialog({
+            buttonLabel: 'Select Directory',
+            defaultPath : require('path').join(require('os').homedir(), 'Desktop'),
+            properties: [
+                'openDirectory'
+            ]}).then((result) => {
+            console.log(result)
+            if (result.canceled === false) {
+                writeWindow.webContents.send('updateWriteInput', result.filePaths[0])
+            }
+        })
+    })
+
+    writeWindow.on('closed', () => {
+        ipcMain.removeAllListeners('openFileSelectDialog')
+        ipcMain.removeAllListeners('openDirectorySelectDialog')
     })
 
     return writeWindow

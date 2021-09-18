@@ -29,3 +29,7 @@ textarea {
 .progress-bar {
     height: 15px;
 }
+
+body.hide-overflow {
+    overflow: hidden;
+}

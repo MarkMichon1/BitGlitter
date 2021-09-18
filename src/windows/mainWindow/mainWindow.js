@@ -11,12 +11,14 @@ const createUserGuideWindow = require('../userGuide/userGuide')
 const createWriteWindow = require('../write/write')
 const WindowManager = require('../../utilities/windowManager')
 
-function createMainWindow (isDev) {
+function createMainWindow (isDev, operatingSystem) {
     let mainWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'BitGlitter v1.0',
-        width: 800,
-        height: 625,
+        // width: operatingSystem === 'linux' ? 800 : 840,
+        // height: operatingSystem === 'linux' ? 625 : 660,
+        width: 815,
+        height: 660,
         resizable: isDev,
         icon: './assets/icons/icon.png',
         darkTheme: true,
@@ -25,6 +27,7 @@ function createMainWindow (isDev) {
             contextIsolation: false
         }
     })
+    const operatingSystemUsed = operatingSystem
     const writeWindow = new WindowManager(createWriteWindow, isDev, mainWindow)
     const readWindow = new WindowManager(createReadWindow, isDev, mainWindow)
     const savedStreamWindow = new WindowManager(createSavedStreamsWindow, isDev, mainWindow)
