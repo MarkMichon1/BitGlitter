@@ -40,7 +40,6 @@ function createWriteWindow (isDev, parentWindow) {
                 'openFile'
             ]
         }).then((result) => {
-            console.log(result)
             if (result.canceled === false) {
                 writeWindow.webContents.send('updateWriteInput', result.filePaths[0])
             }
@@ -54,7 +53,6 @@ function createWriteWindow (isDev, parentWindow) {
             properties: [
                 'openDirectory'
             ]}).then((result) => {
-            console.log(result)
             if (result.canceled === false) {
                 writeWindow.webContents.send('updateWriteInput', result.filePaths[0])
             }

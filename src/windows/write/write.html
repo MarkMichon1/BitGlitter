@@ -59,9 +59,24 @@
                     <div>
                         <button class="btn btn-primary" type="button" id="input-path-button" disabled="disabled">Select File/Directory</button>
                     </div>
-                    <div id="input-path-display"></div>
+                    <div id="selected-path" class="font-weight-bold"></div>
+                    <div id="input-path-display" class="hidden">
+                        <span class="loading-spinner" id="step-1-spinner"></span>
+                        <span id="input-path-status-text"></span>
+                    </div>
                 </td>
             </tr>
+<!--            <tr>-->
+<!--                <th>-->
+<!--                    Payload Select-->
+<!--                </th>-->
+<!--                <td class="text-right">-->
+<!--                    <div>-->
+<!--                        <button class="btn btn-primary" type="button" id="input-path-button" disabled="disabled">Select File/Directory</button>-->
+<!--                    </div>-->
+<!--                    <div id="input-path-display"></div>-->
+<!--                </td>-->
+<!--            </tr>-->
             </tbody>
         </table>
     </div>
