@@ -3,6 +3,9 @@ const { ipcRenderer, remote } = require('electron')
 const io = require("socket.io-client");
 const {log} = require("nodemon/lib/utils");
 
+const display = require('../../utilities/display');
+const {humanizeFileSize} = require("../../utilities/display");
+
 /*
     *** Setup Variables ***
 */
@@ -17,7 +20,7 @@ const stepTwoElement = document.getElementById('step-two')
 const stepThreeElement = document.getElementById('step-three')
 // Step 4/5 and associated elements
 const stepFourElement = document.getElementById('step-four')
-// Step 4/5 and associated elements
+// Step 5/5 and associated elements
 const stepFiveElement = document.getElementById('step-five')
 
 const cancelButtonElement = document.getElementById('cancel-button')
@@ -25,10 +28,10 @@ const backButtonElement = document.getElementById('back-button')
 const nextButtonElement = document.getElementById('next-button')
 
 let stepZeroValid = true
-let stepOneValid = true //todo CHANGE
-let stepTwoValid = true
-let stepThreeValid = false
-let stepFourValid = false
+let stepOneValid = true //todo false
+let stepTwoValid = true //todo false
+let stepThreeValid = true
+let stepFourValid = true
 let stepFiveValid = false // Signalling rendering complete
 let currentStep = null
 
@@ -171,6 +174,7 @@ const selectedPathElement = document.getElementById('selected-path')
 
 let inputType = null
 let inputPath = null
+let sizeInBytes = null
 
 const resetStepOneState = () => {
     inputPath = null
@@ -200,28 +204,21 @@ inputPathButtonElement.addEventListener('click', () => {
     }
 })
 
-const abridgedPath = (string) => {
-    if (string.length <= 40) {
-        return string
-    } else {
-        firstChunk = string.slice(0, 20).trim()
-        lastChunk = string.slice(-20).trim()
-        return `${firstChunk} ... ${lastChunk}`
-    }
-}
-
 ipcRenderer.on('updateWriteInput', (event, data) => {
     nextButtonDisable()
     inputPath = data
-    selectedPathElement.textContent = abridgedPath(inputPath)
+    selectedPathElement.textContent = display.abridgedPath(inputPath)
     inputStatusTextElement.textContent = 'Calculating...'
     spinnerElement.classList.remove('hidden')
     inputPathDisplayElement.classList.remove('hidden')
     inputPathButtonElement.setAttribute('disabled', 'disabled')
     axios.post('http://localhost:7218/write/initial-write-data', {path: data}).then((response) => {
+        sizeInBytes = response.data.total_size
+        resultRender()
         spinnerElement.classList.add('hidden')
         inputPathButtonElement.removeAttribute('disabled')
-        inputStatusTextElement.textContent = `${response.data.total_files} file(s), ${response.data.total_size} total size`
+        inputStatusTextElement.textContent = `${response.data.total_files.toLocaleString()} file(s),
+         ${humanizeFileSize(sizeInBytes)} total size`
         stepOneValidate()
     })
 })
@@ -259,26 +256,15 @@ let descriptionValid = true
 
 videoRadioButtonElement.addEventListener('change', () => {
     writeMode = 'video'
+    resultRender()
 })
 imageRadioButtonElement.addEventListener('change', () => {
     writeMode = 'image'
+    resultRender()
 })
 compressionEnabledCheckboxElement.addEventListener('click', () => {
     compressedEnabled = compressionEnabledCheckboxElement.checked
 })
-
-const checkStringASCII = (string_input, extra_chars=false) => {
-    validChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890._- '
-    if (extra_chars) {
-        validChars += '!@#$%^&*()[]{};:\'\"<>,/?=+`~'
-    }
-    for (const char of string_input) {
-        if (!validChars.includes(char)) {
-            return false
-        }
-    }
-    return true
-}
 
 const stepTwoValidate = () => {
     if (nameLengthValid && nameValid && descriptionValid) {
@@ -306,7 +292,7 @@ nameInputElement.addEventListener('input', () => {
         } else if (streamName.length > 150) {
             nameLengthElement.className = 'text-danger'
         }
-        if (checkStringASCII(streamName)) {
+        if (display.checkStringASCII(streamName)) {
             nameValid = true
             nameErrorsElement.classList.add('hidden')
         } else {
@@ -319,7 +305,7 @@ nameInputElement.addEventListener('input', () => {
 
 descriptionInputElement.addEventListener('input', () => {
     streamDescription = descriptionInputElement.value
-    if (checkStringASCII(streamDescription, extra_chars=true)) {
+    if (display.checkStringASCII(streamDescription, extra_chars=true)) {
         descriptionValid = true
         descriptionErrorsElement.classList.add('hidden')
     } else {
@@ -333,6 +319,23 @@ descriptionInputElement.addEventListener('input', () => {
 /*
     *** Step 3/5 -- Render Configuration ***
 */
+const tbaElement = null //todo
+const paletteNameDisplayElement = document.getElementById('palette-name')
+const paletteBitLengthDisplayElement = document.getElementById('palette-bit-length')
+const pixelWidthInputElement = document.getElementById('pixel-width')
+const blockHeightInputElement = document.getElementById('block-height')
+const blockWidthInputElement = document.getElementById('block-width')
+const framesPerSecondInputElement = document.getElementById('frames-per-second')
+const frameDimensionsDisplayElement = document.getElementById('frame-dimensions')
+const blockDimensionsDisplayElement = document.getElementById('block-dimensions')
+const blockErrorsDisplayElement = document.getElementById('block-errors')
+const rawDataPerFrameDisplayElement = document.getElementById('raw-data-per-frame')
+const netDataPerFrameDisplayElement = document.getElementById('net-data-per-frame')
+const rawDataRateDisplayElement = document.getElementById('raw-data-rate')
+const netDataRateDisplayElement = document.getElementById('net-data-rate')
+const payloadAllocationDisplayElement = document.getElementById('payload-allocation')
+const framesNeededDisplayElement = document.getElementById('frames-needed')
+
 let streamPaletteID = '6'
 let streamPaletteBitLength = 6
 let pixelWidth = 24
@@ -340,9 +343,59 @@ let blockHeight = 45
 let blockWidth = 80
 let framesPerSecond = 30
 
-const resultCalculate = () => {
 
+const resultRender = () => {
+    const calibratorBlockOverhead = blockHeight + blockWidth - 1
+    const initializerBlockOverhead = 580
+    const frameHeaderBitOverhead = 352
+    let blocksLeft = blockWidth * blockHeight
+    if (blocksLeft < 1500) {
+        nextButtonDisable()
+        blockErrorsDisplayElement.classList.remove('hidden')
+    } else {
+        blockErrorsDisplayElement.classList.add('hidden')
+        nextButtonEnable()
+    }
+
+    if (writeMode === 'image') {
+        blocksLeft -= (calibratorBlockOverhead + initializerBlockOverhead)
+    }
+
+    const rawDataPerFrame = display.bitsToBytes(blocksLeft * streamPaletteBitLength)
+    const netDataPerFrame = display.bitsToBytes((blocksLeft * streamPaletteBitLength) - frameHeaderBitOverhead)
+    const payloadAllocation = (netDataPerFrame / rawDataPerFrame) * 100
+
+    axios.post('http://localhost:7218/write/frame-estimator', {block_height: blockHeight, block_width:
+        blockWidth, size_in_bytes: sizeInBytes, bit_length: streamPaletteBitLength, output_mode: writeMode})
+        .then((response) => {
+        framesNeededDisplayElement.textContent = `${response.data.total_frames.toLocaleString()} frame(s)`
+    })
+    frameDimensionsDisplayElement.textContent = `${(blockHeight * pixelWidth).toLocaleString()}px H / ${(blockWidth * pixelWidth).toLocaleString()}px W`
+    blockDimensionsDisplayElement.textContent = `${blockHeight.toLocaleString()} blocks H /  ${blockWidth.toLocaleString()} blocks W = ${(blockWidth * blockHeight).toLocaleString()} total blocks`
+    rawDataPerFrameDisplayElement.textContent = `${display.humanizeFileSize(rawDataPerFrame)}`
+    netDataPerFrameDisplayElement.textContent = `${display.humanizeFileSize(netDataPerFrame)}`
+    rawDataRateDisplayElement.textContent = `${display.humanizeFileSize(rawDataPerFrame * framesPerSecond)}/s`
+    netDataRateDisplayElement.textContent = `${display.humanizeFileSize(netDataPerFrame * framesPerSecond)}/s`
+    payloadAllocationDisplayElement.textContent = `${payloadAllocation.toFixed(2)}%`
 }
+
+pixelWidthInputElement.addEventListener('input', () => {
+    pixelWidth = Number.parseInt(pixelWidthInputElement.value, 10)
+    resultRender()
+})
+blockHeightInputElement.addEventListener('input', () => {
+    blockHeight = Number.parseInt(blockHeightInputElement.value, 10)
+    console.log(blockHeight)
+    resultRender()
+})
+blockWidthInputElement.addEventListener('input', () => {
+    blockWidth = Number.parseInt(blockWidthInputElement.value, 10)
+    resultRender()
+})
+framesPerSecondInputElement.addEventListener('input', () => {
+    framesPerSecond = Number.parseInt(framesPerSecondInputElement.value, 10)
+    resultRender()
+})
 
 
 /*

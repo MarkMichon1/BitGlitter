@@ -1,6 +1,8 @@
 const axios = require('axios')
 const { ipcRenderer, remote } = require('electron')
 
+const display = require('../../utilities/display')
+
 // HTML Elements
 // Write output dir path
 const writeOutputDirPathButtonElement = document.getElementById('write-output-dir-button')
@@ -54,23 +56,13 @@ saveButton.addEventListener('click',() => {
     })
 })
 
-const abridgedPath = (string) => {
-    if (string.length <= 40) {
-        return string
-    } else {
-        firstChunk = string.slice(0, 20).trim()
-        lastChunk = string.slice(-20).trim()
-        return `${firstChunk} ... ${lastChunk}`
-    }
-}
-
 // Load current config
 axios.get('http://localhost:7218/config/settings').then((res) => {
     const response = res.data
     writePath = response.write_path
-    writeOutputDirPathOutputElement.textContent = abridgedPath(writePath)
+    writeOutputDirPathOutputElement.textContent = display.abridgedPath(writePath)
     readPath = response.decoded_files_output_dir
-    readOutputDirPathOutputElement.textContent = abridgedPath(readPath)
+    readOutputDirPathOutputElement.textContent = display.abridgedPath(readPath)
     strikeEnable = response.enable_bad_frame_strikes
     badFrameEnableElement.checked = strikeEnable
     strikeCount = response.read_bad_frame_strikes
@@ -97,20 +89,20 @@ readOutputDirPathButtonElement.addEventListener('click', () => {
 
 ipcRenderer.on('updateWritePath', (event, data) => {
     writePath = data
-    writeOutputDirPathOutputElement.textContent = abridgedPath(writePath)
+    writeOutputDirPathOutputElement.textContent = display.abridgedPath(writePath)
 
 })
 
 ipcRenderer.on('updateReadPath', (event, data) => {
     readPath = data
-    readOutputDirPathOutputElement.textContent = abridgedPath(readPath)
+    readOutputDirPathOutputElement.textContent = display.abridgedPath(readPath)
 })
 
 badFrameEnableElement.addEventListener('click', () => {
     strikeEnable = badFrameEnableElement.checked
 })
 
-frameStrikeCountElement.addEventListener('change', () => {
+frameStrikeCountElement.addEventListener('input', () => {
     strikeCount = frameStrikeCountElement.value
 })
 
