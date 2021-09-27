@@ -2,10 +2,10 @@ const axios = require('axios')
 const { ipcRenderer, remote } = require('electron')
 const io = require("socket.io-client");
 const {log} = require("nodemon/lib/utils");
+
 /*
     *** Setup Variables ***
 */
-
 const stepTitleElement = document.getElementById('step-title')
 // Step 0/5 and associated elements
 const stepZeroElement = document.getElementById('step-zero')
@@ -25,21 +25,16 @@ const backButtonElement = document.getElementById('back-button')
 const nextButtonElement = document.getElementById('next-button')
 
 let stepZeroValid = true
-let stepOneValid = false
-let stepTwoValid = false
+let stepOneValid = true //todo CHANGE
+let stepTwoValid = true
 let stepThreeValid = false
 let stepFourValid = false
 let stepFiveValid = false // Signalling rendering complete
 let currentStep = null
 
-const validStringCharacters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890._-'
-
-
 /*
     *** Utilities ***
 */
-
-
 const backButtonEnable = () => backButtonElement.removeAttribute('disabled')
 const backButtonDisable = () => backButtonElement.setAttribute('disabled', 'disabled')
 const nextButtonEnable = () => nextButtonElement.removeAttribute('disabled')
@@ -118,8 +113,7 @@ const backButtonHandler = () => {
     if (currentStep === 1 && stepZeroValid) {
         stepOneSegmentHide()
         stepZeroSegmentLoad()
-    }
-    else if (currentStep === 2) {
+    } else if (currentStep === 2) {
         stepTwoSegmentHide()
         stepOneSegmentLoad()
     } else if (currentStep === 3) {
@@ -159,24 +153,6 @@ const nextButtonHandler = () => {
     }
 }
 
-const stepValidityChecker = (step) => {
-    if (step === 1) {
-        if (inputValid && nameValid && descriptionValid) {
-            nextButtonEnable()
-        } else {
-            nextButtonDisable()
-        }
-    } else if (step === 2) {
-
-    } else if (step === 3) {
-
-    } else if (step === 4) {
-
-    } else if (step === 5) {
-
-    }
-}
-
 /*
     *** Step 0/5 -- Show Once ***
 */
@@ -195,7 +171,7 @@ const selectedPathElement = document.getElementById('selected-path')
 
 let inputType = null
 let inputPath = null
-inputStatusTextElement.textContent = 'ding'
+
 const resetStepOneState = () => {
     inputPath = null
     inputStatusTextElement.textContent = ''
@@ -241,14 +217,13 @@ ipcRenderer.on('updateWriteInput', (event, data) => {
     inputStatusTextElement.textContent = 'Calculating...'
     spinnerElement.classList.remove('hidden')
     inputPathDisplayElement.classList.remove('hidden')
-    //TODO- disable then re-enable button
+    inputPathButtonElement.setAttribute('disabled', 'disabled')
     axios.post('http://localhost:7218/write/initial-write-data', {path: data}).then((response) => {
         spinnerElement.classList.add('hidden')
+        inputPathButtonElement.removeAttribute('disabled')
         inputStatusTextElement.textContent = `${response.data.total_files} file(s), ${response.data.total_size} total size`
         stepOneValidate()
     })
-    // update file count/size
-    // post path to backend, then -> update file count/size
 })
 
 const stepOneValidate = () => {
@@ -256,24 +231,105 @@ const stepOneValidate = () => {
         stepOneValid = true
         nextButtonEnable()
     } else {
+        stepOneValid = false
         nextButtonDisable()
     }
 }
 
-
 /*
     *** Step 2/5 -- Stream Configuration ***
 */
-let writeModeVideo = true
+const videoRadioButtonElement = document.getElementById('radio-video-mode')
+const imageRadioButtonElement = document.getElementById('radio-image-mode')
+const compressionEnabledCheckboxElement = document.getElementById('compression-enabled')
+const nameInputElement = document.getElementById('stream-name')
+const nameLengthElement = document.getElementById('name-length')
+const nameErrorsElement = document.getElementById('name-errors')
+const descriptionInputElement = document.getElementById('stream-description')
+const descriptionErrorsElement = document.getElementById('description-errors')
+
+let writeMode = 'video'
 let compressedEnabled = true
-//Stream name validate:  AZ, az, 09, ._-
+let streamName = ''
+let streamDescription = ''
 
-let streamName = null
-let streamDescription = null
-
-
+let nameLengthValid = false
 let nameValid = false
-let descriptionValid = false
+let descriptionValid = true
+
+videoRadioButtonElement.addEventListener('change', () => {
+    writeMode = 'video'
+})
+imageRadioButtonElement.addEventListener('change', () => {
+    writeMode = 'image'
+})
+compressionEnabledCheckboxElement.addEventListener('click', () => {
+    compressedEnabled = compressionEnabledCheckboxElement.checked
+})
+
+const checkStringASCII = (string_input, extra_chars=false) => {
+    validChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890._- '
+    if (extra_chars) {
+        validChars += '!@#$%^&*()[]{};:\'\"<>,/?=+`~'
+    }
+    for (const char of string_input) {
+        if (!validChars.includes(char)) {
+            return false
+        }
+    }
+    return true
+}
+
+const stepTwoValidate = () => {
+    if (nameLengthValid && nameValid && descriptionValid) {
+        stepOneValid = true
+        nextButtonEnable()
+    } else {
+        stepOneValid = false
+        nextButtonDisable()
+    }
+}
+
+nameInputElement.addEventListener('input', () => {
+    streamName = nameInputElement.value
+    nameLengthElement.textContent = `${streamName.length}/150`
+    nameLengthValid = streamName.length > 0 && streamName.length <= 150
+    if (streamName.length === 0) {
+        nameLengthElement.classList.add('hidden')
+        nameValid = false
+    } else {
+        nameLengthElement.classList.remove('hidden')
+        if (streamName.length > 0 && streamName.length <= 99) {
+            nameLengthElement.className = 'text-success'
+        } else if (streamName.length > 99 && streamName.length <= 150) {
+            nameLengthElement.className = 'text-secondary'
+        } else if (streamName.length > 150) {
+            nameLengthElement.className = 'text-danger'
+        }
+        if (checkStringASCII(streamName)) {
+            nameValid = true
+            nameErrorsElement.classList.add('hidden')
+        } else {
+            nameValid = false
+            nameErrorsElement.classList.remove('hidden')
+        }
+    }
+    stepTwoValidate()
+})
+
+descriptionInputElement.addEventListener('input', () => {
+    streamDescription = descriptionInputElement.value
+    if (checkStringASCII(streamDescription, extra_chars=true)) {
+        descriptionValid = true
+        descriptionErrorsElement.classList.add('hidden')
+    } else {
+        descriptionValid = false
+        descriptionErrorsElement.classList.remove('hidden')
+    }
+    stepTwoValidate()
+})
+
+
 /*
     *** Step 3/5 -- Render Configuration ***
 */
@@ -284,6 +340,10 @@ let blockHeight = 45
 let blockWidth = 80
 let framesPerSecond = 30
 
+const resultCalculate = () => {
+
+}
+
 
 /*
     *** Step 4/5 -- Encryption Configuration ***
@@ -293,7 +353,7 @@ let fileMaskEnabled = false
 let scryptN = 14
 let scryptR = 8
 let scryptP = 1
-
+//remove 24 bit from list when vid selected.  when pic -> vid, change palette to 6 bit
 
 /*
     *** Step 5/5 -- Rendering ***

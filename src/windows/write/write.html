@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../../assets/css/bootstrap-icons.css">
     <link rel="stylesheet" href="../../../assets/css/halfmoon.min.css">
     <link rel="stylesheet" href="../../../assets/css/helperClasses.css">
     <script src="../../../assets/js/halfmoon.min.js" defer></script>
@@ -18,7 +19,7 @@
                 run on various use cases, some values for some options may break it.  In addition, it is not yet fully
                 optimized when rendering streams over several tens of megabytes when using the default write
                 configuration, resulting in relatively large outputs.  <strong>In this current version for maximum
-                stability, it is recommended to stick with the default write configuration, using smaller file sizes.</strong>
+                    stability, it is recommended to stick with the default write configuration, using smaller file sizes.</strong>
             </p>
             <p>Any found issues will be fixed as they are reported, and the app will continue to get refined over time.
                 Thanks for understanding! 👍</p>
@@ -30,9 +31,9 @@
             <tbody>
             <tr>
                 <th>
-                <span data-toggle="tooltip" data-title="Choose whether you're sending a single file, or a directory.">
-                    <i class="bi bi-question-circle blue"></i>
-                </span>  I am sending...
+                    <span data-toggle="tooltip" data-title="Choose whether you're sending a single file, or a directory.">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  I am sending...
                 </th>
                 <td>
                     <div>
@@ -51,9 +52,9 @@
             </tr>
             <tr>
                 <th>
-                <span data-toggle="tooltip" data-title="Select which file or directory you wish to write.">
-                    <i class="bi bi-question-circle blue"></i>
-                </span>  Payload Select
+                    <span data-toggle="tooltip" data-title="Select which file or directory you wish to write.">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  Payload Select
                 </th>
                 <td class="text-right">
                     <div>
@@ -66,28 +67,220 @@
                     </div>
                 </td>
             </tr>
-<!--            <tr>-->
-<!--                <th>-->
-<!--                    Payload Select-->
-<!--                </th>-->
-<!--                <td class="text-right">-->
-<!--                    <div>-->
-<!--                        <button class="btn btn-primary" type="button" id="input-path-button" disabled="disabled">Select File/Directory</button>-->
-<!--                    </div>-->
-<!--                    <div id="input-path-display"></div>-->
-<!--                </td>-->
-<!--            </tr>-->
             </tbody>
         </table>
     </div>
     <div class="no-display" id="step-two">
-        step 2
+        <table class="table">
+            <tbody>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="Choose whether you wish to output a video (.mp4), or a collection of frames (.png)">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  Render Mode
+                </th>
+                <td>
+                    <div>
+                        <div class="form-group">
+                            <div class="custom-radio">
+                                <input type="radio" name="input-type" id="radio-video-mode" value="video" required="required" checked>
+                                <label for="radio-video-mode">Video</label>
+                            </div>
+                            <div class="custom-radio">
+                                <input type="radio" name="input-type" id="radio-image-mode" value="image" required="required">
+                                <label for="radio-image-mode">Image(s)</label>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="Toggles whether to compress your payload while encoded- This should always be enabled!">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  Compression Enabled
+                </th>
+                <td>
+                    <div class="custom-checkbox">
+                        <input type="checkbox" id="compression-enabled" checked>
+                        <label for="compression-enabled"></label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="The name for your stream which will be included in its metadata.  150 character limit, required.">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>Stream Name (Required)
+                </th>
+                <td>
+                    <div><input type="text" class="form-control" id="stream-name" placeholder="My BitGlitter Stream"></div>
+                    <div>
+                        <span id="name-length" class="hidden">0/150</span>  <span id="name-errors" class="text-danger hidden">Can only use a-z, A-Z, 0-9, and -_.</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="An optional field to include any extra information about the stream.  No length limit, not required.">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span> Stream Description
+                </th>
+                <td>
+                    <div><textarea class="form-control" id="stream-description" placeholder="An optional description..."></textarea></div>
+                    <div>
+                        <span id="description-errors" class="text-danger hidden">Can only use valid ASCII characters.</span>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
     <div class="no-display" id="step-three">
-        step 3
+        <table class="table">
+            <tbody>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="Select the palette used for rendering.  Use palette settings on main window to learn more.">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  Palette Selection
+                </th>
+                <td>
+                    <div>Selection placeholder</div>
+                    <div id="palette-name">6 Bit Default</div>
+                    <div id="palette-bit-length">6 bits per block</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="How many pixels wide each block will be">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  Pixel Width
+                </th>
+                <td>
+                    <input type="number" min="1" id="pixel-width" value="24">
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="How many blocks vertically will be used in each frame">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  Block Height
+                </th>
+                <td>
+                    <input type="number" min="1" id="block-height" value="45">
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="How many blocks horizontally will be used in each frame">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  Block Width
+                </th>
+                <td>
+                    <input type="number" min="1" id="block-width" value="80">
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="If rendering a video, how many frames will be rendered in a second">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  Frames per Second
+                </th>
+                <td>
+                    <input type="number" min="1" id="frames-per-second" value="30">
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Results
+                </th>
+                <td>
+                    <div>Frame dimensions: <span id="frame-dimensions"></span></div>
+                    <div>Data per Frame: <span id="data-per-frame"></span></div>
+                    <div>
+                        <span data-toggle="tooltip" data-title="Data transfer rate of the overall frame">
+                            <i class="bi bi-question-circle blue"></i>
+                        </span>
+                        Raw Data Transfer Rate: <span id="raw-data-rate"></span></div>
+                    <div>
+                        <span data-toggle="tooltip" data-title="Data transfer rate after subtracting overhead from headers">
+                            <i class="bi bi-question-circle blue"></i>
+                        </span>
+                        Net Data Transfer Rate: <span id="net-data-rate"></span>
+                    </div>
+                    <div>
+                        <span data-toggle="tooltip" data-title="What percentage of the frame is used for the payload (higher is better)">
+                            <i class="bi bi-question-circle blue"></i>
+                        </span>
+                        Payload Allocation: <span id="payload-allocation">x%</span>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
     <div class="no-display" id="step-four">
-        step 4
+        <table class="table">
+            <tbody>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="Optionally encrypt the stream, accepts all ASCII characters">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  Encryption Key
+                </th>
+                <td>
+                    <div><input type="text" class="form-control" id="encryption-key" placeholder="Your key here"></div>
+                    <div>
+                        <span id="encryption-errors" class="text-danger hidden">Can only use valid ASCII characters.</span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="If encrypting, masks payload contents until the correct password is used">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  File Masking Enabled
+                </th>
+                <td>
+                    <div class="custom-checkbox">
+                        <input type="checkbox" id="file-masking-enabled" checked>
+                        <label for="file-masking-enabled"></label>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="2 ** supplied value.  Don't touch unless you know what you're doing!">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  scrypt N value
+                </th>
+                <td>
+                    <input type="number" min="1" id="scrypt-n">
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="Don't touch unless you know what you're doing!">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  scrypt R value
+                </th>
+                <td>
+                    <input type="number" min="1" id="scrypt-r">
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="Don't touch unless you know what you're doing!">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  scrypt P value
+                </th>
+                <td>
+                    <input type="number" min="1" id="scrypt-p">
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
     <div class="no-display" id="step-five">
         <p id="render-text-info">Starting...</p>
