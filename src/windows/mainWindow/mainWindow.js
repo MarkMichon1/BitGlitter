@@ -1,4 +1,5 @@
 const { app, BrowserWindow, Menu, nativeTheme, shell, ipcMain} = require('electron')
+const { appVersion, operatingSystem, productionMode } = require('../../../config')
 
 const createAboutWindow = require('../about/about')
 const createPaletteOverviewWindow = require('../paletteOverview/paletteOverview')
@@ -11,15 +12,15 @@ const createUserGuideWindow = require('../userGuide/userGuide')
 const createWriteWindow = require('../write/write')
 const WindowManager = require('../../utilities/windowManager')
 
-function createMainWindow (isDev, operatingSystem) {
+function createMainWindow () {
     let mainWindow = new BrowserWindow({
         backgroundColor: '#25282C',
-        title: 'BitGlitter v1.0',
+        title: `BitGlitter v${appVersion}`,
         // width: operatingSystem === 'linux' ? 800 : 840,
         // height: operatingSystem === 'linux' ? 625 : 660,
         width: 815,
         height: 660,
-        resizable: isDev,
+        resizable: !productionMode,
         icon: './assets/icons/icon.png',
         darkTheme: true,
         webPreferences: {
@@ -27,15 +28,15 @@ function createMainWindow (isDev, operatingSystem) {
             contextIsolation: false
         }
     })
-    const operatingSystemUsed = operatingSystem
-    const writeWindow = new WindowManager(createWriteWindow, isDev, mainWindow)
-    const readWindow = new WindowManager(createReadWindow, isDev, mainWindow)
-    const savedStreamWindow = new WindowManager(createSavedStreamsWindow, isDev, mainWindow)
-    const paletteOverviewWindow = new WindowManager(createPaletteOverviewWindow, isDev, mainWindow)
-    const settingsWindow = new WindowManager(createSettingsWindow, isDev, mainWindow)
-    const statisticsWindow = new WindowManager(createStatisticsWindow, isDev, mainWindow)
-    const userGuideWindow = new WindowManager(createUserGuideWindow, isDev, mainWindow)
-    const aboutWindow = new WindowManager(createAboutWindow, isDev, mainWindow)
+
+    const writeWindow = new WindowManager(createWriteWindow, mainWindow)
+    const readWindow = new WindowManager(createReadWindow, mainWindow)
+    const savedStreamWindow = new WindowManager(createSavedStreamsWindow, mainWindow)
+    const paletteOverviewWindow = new WindowManager(createPaletteOverviewWindow, mainWindow)
+    const settingsWindow = new WindowManager(createSettingsWindow, mainWindow)
+    const statisticsWindow = new WindowManager(createStatisticsWindow, mainWindow)
+    const userGuideWindow = new WindowManager(createUserGuideWindow, mainWindow)
+    const aboutWindow = new WindowManager(createAboutWindow, mainWindow)
 
 
     const menu = [
@@ -49,7 +50,7 @@ function createMainWindow (isDev, operatingSystem) {
                 },
                 {
                     label: 'Read Stream',
-                    accelerator: !isDev ? 'Ctrl+R' : 'Ctrl+T',
+                    accelerator: productionMode ? 'Ctrl+R' : 'Ctrl+T',
                     click: () => readWindow.click()
                 },
                 {
@@ -124,7 +125,7 @@ function createMainWindow (isDev, operatingSystem) {
 
     ]
 
-    if (isDev) {
+    if (!productionMode) {
         menu.push(
             {
                 label: 'Dev',
@@ -138,7 +139,7 @@ function createMainWindow (isDev, operatingSystem) {
                     {
                         label: 'Reset Flask Executable',
                         click: () => {
-                            console.log('Placeholder')
+                            console.log('Event goes here')
                         }
                     },
                 ]
@@ -147,14 +148,13 @@ function createMainWindow (isDev, operatingSystem) {
     }
 
     const mainMenu = Menu.buildFromTemplate(menu)
-    // mainWindow.setMenu(mainMenu)
     Menu.setApplicationMenu(mainMenu)
 
     mainWindow.loadFile(`${__dirname}/mainWindow.html`)
 
     // External links open in browser rather than in app
-    mainWindow.webContents.on('new-window', function(e, url) {
-        e.preventDefault();
+    mainWindow.webContents.on('new-window', function(event, url) {
+        event.preventDefault();
         require('electron').shell.openExternal(url);
     })
 

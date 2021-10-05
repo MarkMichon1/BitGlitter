@@ -1,28 +1,29 @@
 const { BrowserWindow } = require('electron')
+const { operatingSystem, productionMode } = require('../../../config')
 
-function createSavedStreamsWindow (isDev, parentWindow) {
+function createSavedStreamsWindow (parentWindow) {
     let savedStreamsWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Saved Streams',
         width: 800,
         height: 625,
-        resizable: isDev,
+        resizable: !productionMode,
         icon: './assets/icons/icon.png',
         parent: parentWindow,
         modal: true
     })
 
-    if (isDev) {
-        savedStreamsWindow.webContents.openDevTools()
-    } else {
+    if (productionMode) {
         savedStreamsWindow.setMenu(null)
+    } else {
+        savedStreamsWindow.webContents.openDevTools()
     }
 
     savedStreamsWindow.loadFile(`${__dirname}/savedStreams.html`)
 
     // External links open in browser rather than in app
-    savedStreamsWindow.webContents.on('new-window', function(e, url) {
-        e.preventDefault();
+    savedStreamsWindow.webContents.on('new-window', function(event, url) {
+        event.preventDefault();
         require('electron').shell.openExternal(url);
     })
 

@@ -1,13 +1,13 @@
 const { BrowserWindow, ipcMain, dialog} = require('electron')
-const path = require('path')
+const { operatingSystem, productionMode } = require('../../../config')
 
-function createWriteWindow (isDev, parentWindow) {
+function createWriteWindow (parentWindow) {
     let writeWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Write Stream',
         width: 800,
         height: 625,
-        resizable: isDev,
+        resizable: !productionMode,
         icon: './assets/icons/icon.png',
         parent: parentWindow,
         modal: true,
@@ -18,17 +18,17 @@ function createWriteWindow (isDev, parentWindow) {
         }
     })
 
-    if (isDev) {
-        writeWindow.webContents.openDevTools()
-    } else {
+    if (productionMode) {
         writeWindow.setMenu(null)
+    } else {
+        writeWindow.webContents.openDevTools()
     }
 
     writeWindow.loadFile(`${__dirname}/write.html`)
 
     // External links open in browser rather than in app
-    writeWindow.webContents.on('new-window', function(e, url) {
-        e.preventDefault();
+    writeWindow.webContents.on('new-window', function(event, url) {
+        event.preventDefault();
         require('electron').shell.openExternal(url);
     })
 

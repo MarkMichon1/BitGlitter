@@ -1,12 +1,13 @@
 const { BrowserWindow } = require('electron')
+const { operatingSystem, productionMode } = require('../../../../config')
 
-function createCreatePaletteWindow (isDev, parentWindow) {
+function createCreatePaletteWindow (parentWindow) {
     let createPaletteWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Create Palette',
         width: 585,
         height: 430,
-        resizable: isDev,
+        resizable: !productionMode,
         icon: '',
         parent: parentWindow,
         modal: true,
@@ -17,10 +18,10 @@ function createCreatePaletteWindow (isDev, parentWindow) {
         }
     })
 
-    if (isDev) {
-        createPaletteWindow.webContents.openDevTools()
-    } else {
+    if (productionMode) {
         createPaletteWindow.setMenu(null)
+    } else {
+        createPaletteWindow.webContents.openDevTools()
     }
 
     createPaletteWindow.loadFile(`${__dirname}/createPalette.html`)

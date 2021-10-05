@@ -2,15 +2,15 @@ const { BrowserWindow, ipcMain} = require('electron')
 const createCreatePaletteWindow = require('./createPalette/createPalette')
 const createBase64ImportWindow = require('./b64Import/b64Import')
 const WindowManager = require('../../utilities/windowManager')
-const {log} = require("nodemon/lib/utils");
+const { operatingSystem, productionMode } = require('../../../config')
 
-function createPaletteOverviewWindow (isDev, parentWindow, firstRun) {
+function createPaletteOverviewWindow (parentWindow) {
     let paletteOverviewWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Palettes',
         width: 815,
         height: 625,
-        resizable: isDev,
+        resizable: !productionMode,
         icon: './assets/icons/icon.png',
         parent: parentWindow,
         modal: true,
@@ -21,27 +21,29 @@ function createPaletteOverviewWindow (isDev, parentWindow, firstRun) {
         }
     })
 
-    const createPaletteWindow = new WindowManager(createCreatePaletteWindow, isDev, paletteOverviewWindow)
-    const importPaletteWindow = new WindowManager(createBase64ImportWindow, isDev, paletteOverviewWindow)
+    const createPaletteWindow = new WindowManager(createCreatePaletteWindow, paletteOverviewWindow)
+    const importPaletteWindow = new WindowManager(createBase64ImportWindow, paletteOverviewWindow)
 
-    if (isDev) {
-        paletteOverviewWindow.webContents.openDevTools()
-    } else {
+    if (productionMode) {
         paletteOverviewWindow.setMenu(null)
+    } else {
+        paletteOverviewWindow.webContents.openDevTools()
     }
 
     paletteOverviewWindow.loadFile(`${__dirname}/paletteOverview.html`)
 
     // Events
-    if (firstRun) {
-        ipcMain.on('importPalette', (event, options) => {
-            paletteOverviewWindow.webContents.send('createdPalette', options)
-        })
+    ipcMain.on('importPalette', (event, options) => {
+        paletteOverviewWindow.webContents.send('createdPalette', options)
+    })
+    ipcMain.on('openCreatePaletteWindow', () => createPaletteWindow.click())
+    ipcMain.on('openImportPaletteWindow', () => importPaletteWindow.click())
 
-        ipcMain.on('openCreatePaletteWindow', () => createPaletteWindow.click())
-
-        ipcMain.on('openImportPaletteWindow', () => importPaletteWindow.click())
-    }
+    paletteOverviewWindow.on('closed', () => {
+        ipcMain.removeAllListeners('importPalette')
+        ipcMain.removeAllListeners('openCreatePaletteWindow')
+        ipcMain.removeAllListeners('openImportPaletteWindow')
+    })
 
     return paletteOverviewWindow
 }

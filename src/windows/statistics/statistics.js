@@ -1,12 +1,13 @@
 const { BrowserWindow } = require('electron')
+const { operatingSystem, productionMode } = require('../../../config')
 
-function createStatisticsWindow (isDev, parentWindow) {
+function createStatisticsWindow (parentWindow) {
     let statisticsWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Statistics',
         width: 585,
         height: 430,
-        resizable: isDev,
+        resizable: !productionMode,
         icon: './assets/icons/icon.png',
         parent: parentWindow,
         modal: true,
@@ -17,17 +18,17 @@ function createStatisticsWindow (isDev, parentWindow) {
         }
     })
 
-    if (isDev) {
-        statisticsWindow.webContents.openDevTools()
-    } else {
+    if (productionMode) {
         statisticsWindow.setMenu(null)
+    } else {
+        statisticsWindow.webContents.openDevTools()
     }
 
     statisticsWindow.loadFile(`${__dirname}/statistics.html`)
 
     // External links open in browser rather than in app
-    statisticsWindow.webContents.on('new-window', function(e, url) {
-        e.preventDefault();
+    statisticsWindow.webContents.on('new-window', function(event, url) {
+        event.preventDefault();
         require('electron').shell.openExternal(url);
     })
 

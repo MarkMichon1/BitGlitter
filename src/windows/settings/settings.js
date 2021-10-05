@@ -1,13 +1,13 @@
-const { app, BrowserWindow, dialog, ipcMain } = require('electron')
-const WindowManager = require('../../utilities/windowManager')
+const { BrowserWindow, dialog, ipcMain } = require('electron')
+const { operatingSystem, productionMode } = require('../../../config')
 
-function createSettingsWindow (isDev, parentWindow, firstRun) {
+function createSettingsWindow (parentWindow) {
     let settingsWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Settings',
         width: 800,
         height: 540,
-        resizable: isDev,
+        resizable: !productionMode,
         icon: './assets/icons/icon.png',
         parent: parentWindow,
         modal: true,
@@ -19,17 +19,17 @@ function createSettingsWindow (isDev, parentWindow, firstRun) {
     })
 
 
-    if (isDev) {
-        settingsWindow.webContents.openDevTools()
-    } else {
+    if (productionMode) {
         settingsWindow.setMenu(null)
+    } else {
+        settingsWindow.webContents.openDevTools()
     }
 
     settingsWindow.loadFile(`${__dirname}/settings.html`)
 
     // External links open in browser rather than in app
-    settingsWindow.webContents.on('new-window', function(e, url) {
-        e.preventDefault();
+    settingsWindow.webContents.on('new-window', function(event, url) {
+        event.preventDefault();
         require('electron').shell.openExternal(url);
     })
 

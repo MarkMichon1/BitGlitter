@@ -413,13 +413,15 @@ let scryptP = 1
 */
 const renderTextInfo = document.getElementById('render-text-info')
 const renderProgressBar = document.getElementById('render-progress-bar')
+const successSound = new Audio('../../../assets/mp3/success.mp3')
+const errorSound = new Audio('../../../assets/mp3/error.mp3')
 
 const socket = io('ws://localhost:7218')
 
 let writeSavePath = null
 
 const writeStart = () => {
-    // axios.post() feed arguments into this
+    axios.post('http://localhost:7218/write/', {data: true}) //feed arguments into this
     console.log('Placeholder to start write')
 
 }
@@ -448,7 +450,19 @@ socket.on('write-save-path', data => {
 
 socket.on('write-done', data => {
     // Signals write is complete
+    successSound.play()
     renderTextInfo.textContent = `Write Complete!  Your ${writeModeVideo ? 'video is' : 'frames are'} available here: ${writeSavePath}`
+    nextButtonEnable()
+    nextButtonElement.textContent = 'Finish'
+})
+
+socket.on('write-error', data => {
+    // Signals backend write() failed
+    console.log(data)
+    errorSound.play()
+    renderTextInfo.classList.add('text-secondary')
+    renderTextInfo.textContent = `Write failure- this can be caused by write parameters, or something else.  Please let 
+    us know in Discord along with what you did, we will investigate and fix this ASAP.` //TODO CHANGE
     nextButtonEnable()
     nextButtonElement.textContent = 'Finish'
 })

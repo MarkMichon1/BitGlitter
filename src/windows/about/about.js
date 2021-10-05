@@ -1,21 +1,26 @@
-const { BrowserWindow } = require('electron')
+const { BrowserWindow, ipcMain} = require('electron')
+const {appVersion, operatingSystem, productionMode} = require('../../../config')
 
-function createAboutWindow (isDev, parentWindow) {
+function createAboutWindow (parentWindow) {
     let aboutWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'About BitGlitter',
         width: 650,
         height: 285,
-        resizable: isDev,
+        resizable: !productionMode,
         icon: './assets/icons/icon.png',
         parent: parentWindow,
-        modal: true
+        modal: true,
+        webPreferences: {
+            contextIsolation: false,
+            nodeIntegration: true
+        }
     })
 
-    if (isDev) {
-        aboutWindow.webContents.openDevTools()
-    } else {
+    if (productionMode) {
         aboutWindow.setMenu(null)
+    } else {
+        aboutWindow.webContents.openDevTools()
     }
 
     aboutWindow.loadFile(`${__dirname}/about.html`)
