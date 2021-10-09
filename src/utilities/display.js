@@ -39,4 +39,11 @@ const checkStringASCII = (string_input, extra_chars=false) => {
 
 const bitsToBytes = (bits) => Math.floor(bits / 8)
 
-module.exports = { abridgedPath, bitsToBytes, checkStringASCII, humanizeFileSize }
+const bitorBits = (quantity) => {
+    if (quantity === 1) {
+        return 'bit'
+    }
+    return 'bits'
+}
+
+module.exports = { abridgedPath, bitorBits, bitsToBytes, checkStringASCII, humanizeFileSize }

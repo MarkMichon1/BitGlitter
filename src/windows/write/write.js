@@ -1,5 +1,6 @@
 const { BrowserWindow, ipcMain, dialog} = require('electron')
 const { operatingSystem, productionMode } = require('../../../config')
+const {errorDump} = require('../../utilities/errorDump')
 
 function createWriteWindow (parentWindow) {
     let writeWindow = new BrowserWindow({
@@ -59,14 +60,17 @@ function createWriteWindow (parentWindow) {
         })
     })
 
+    ipcMain.on('writeError', (event, data) => {
+        errorDump('Write', data.modeState, data.backendError, data.path,)
+    })
+
     writeWindow.on('closed', () => {
         ipcMain.removeAllListeners('openFileSelectDialog')
         ipcMain.removeAllListeners('openDirectorySelectDialog')
+        ipcMain.removeAllListeners('writeError')
     })
 
     return writeWindow
 }
 
 module.exports = createWriteWindow
-
-//https://www.electronjs.org/docs/api/dialog

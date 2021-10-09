@@ -1,6 +1,8 @@
 const axios = require('axios')
 const { ipcRenderer, remote } = require('electron')
 
+const { sortPaletteList } = require('../../utilities/palette')
+
 let paletteList = []
 let activePalette = null
 let activePaletteLi = null
@@ -46,7 +48,7 @@ const generateSampleFrames = async (activeCurrentPalette) => {
         }
     }
 
-    const render = () => {
+    const renderFrame = () => {
         for (const block of sampleBlocks) {
 
             randomColor = chooseColor(activeCurrentPalette.color_set, activeCurrentPalette.is_24_bit)
@@ -55,13 +57,13 @@ const generateSampleFrames = async (activeCurrentPalette) => {
     }
 
     // Instant change when clicked, with new samples every 2 sec
-    render()
+    renderFrame()
     while(true) {
         await new Promise(r => setTimeout(r, 2000));
         if (activeCurrentPalette !== activePalette) {
             break
         }
-        render()
+        renderFrame()
     }
 }
 
@@ -138,29 +140,10 @@ const loadActivePalette = (activePalette) => {
     }
 }
 
-const sortPaletteList = () => {
-    paletteList.sort((first, second) => {
-        let firstLowered = first.name.toLowerCase(),
-            secondLowered = second.name.toLowerCase();
-        if (firstLowered < secondLowered) {
-            return -1;
-        }
-        if (firstLowered > secondLowered) {
-            return 1;
-        }
-        return 0;
-    })
-}
-
-const onPaletteSelect = (palette, paletteLi) => {
-
-}
-
-const renderPalette = (palette) => {
+const generatePaletteLi = (palette) => {
     let newLi = document.createElement('li')
     newLi.setAttribute('palette-id', palette.palette_id)
     newLi.addEventListener('click', () => {
-        onPaletteSelect() ///////////////////////////////////////////
         if (activePaletteLi){
             activePaletteLi.classList.remove('active')
         }
@@ -175,7 +158,7 @@ const renderPalette = (palette) => {
             generateSampleFrames(activePalette)
         }
     })
-    let newContent = document.createTextNode(palette.name)
+    const newContent = document.createTextNode(palette.name)
     newLi.appendChild(newContent)
     paletteListElement.appendChild(newLi)
 }
@@ -194,7 +177,7 @@ const refreshPaletteList = initial => {
         paletteList = response.data
         sortPaletteList()
         paletteList.forEach(palette => {
-            renderPalette(palette)
+            generatePaletteLi(palette)
         })
 
         if (initial) {
@@ -217,6 +200,6 @@ ipcRenderer.on('createdPalette', (event, options) => {
         paletteListElement.removeChild(paletteListElement.firstChild)
     }
     paletteList.forEach(palette => {
-        renderPalette(palette)
+        generatePaletteLi(palette)
     })
 })

@@ -1,0 +1,36 @@
+/*todo: revisit*/
+div.sidebar {
+    position: relative;
+    /*float: right;*/
+    width: 180px;
+    background-color: #DDD;
+    overflow-y: scroll;
+    height: 150px;
+    margin-bottom: 10px;
+}
+
+ul {
+    margin-bottom: 0;
+}
+
+li {
+    list-style-type: none;
+    font-size: 16px;
+    padding: 2px 5px;
+    margin-bottom: 0;
+    margin-top: 0
+}
+
+li:hover {
+    background: #48444c;
+}
+
+li.active {
+    font-weight: bold;
+    background: #7f7c82;
+}
+
+li.active:hover {
+    font-weight: bold;
+    background: #7f7c82;
+}

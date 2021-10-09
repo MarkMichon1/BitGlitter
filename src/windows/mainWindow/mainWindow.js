@@ -1,5 +1,5 @@
 const { app, BrowserWindow, Menu, nativeTheme, shell, ipcMain} = require('electron')
-const { appVersion, operatingSystem, productionMode } = require('../../../config')
+const { operatingSystem, productionMode } = require('../../../config')
 
 const createAboutWindow = require('../about/about')
 const createPaletteOverviewWindow = require('../paletteOverview/paletteOverview')
@@ -15,7 +15,7 @@ const WindowManager = require('../../utilities/windowManager')
 function createMainWindow () {
     let mainWindow = new BrowserWindow({
         backgroundColor: '#25282C',
-        title: `BitGlitter v${appVersion}`,
+        title: 'BitGlitter',
         // width: operatingSystem === 'linux' ? 800 : 840,
         // height: operatingSystem === 'linux' ? 625 : 660,
         width: 815,

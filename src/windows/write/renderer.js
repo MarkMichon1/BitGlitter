@@ -1,10 +1,10 @@
 const axios = require('axios')
 const { ipcRenderer, remote } = require('electron')
 const io = require("socket.io-client");
-const {log} = require("nodemon/lib/utils");
 
 const display = require('../../utilities/display');
-const {humanizeFileSize} = require("../../utilities/display");
+const { bitorBits, humanizeFileSize } = require("../../utilities/display");
+const { sortPaletteList } = require('../../utilities/palette')
 
 /*
     *** Setup Variables ***
@@ -319,7 +319,7 @@ descriptionInputElement.addEventListener('input', () => {
 /*
     *** Step 3/5 -- Render Configuration ***
 */
-const tbaElement = null //todo
+const paletteListElement = document.getElementById('palette-list')
 const paletteNameDisplayElement = document.getElementById('palette-name')
 const paletteBitLengthDisplayElement = document.getElementById('palette-bit-length')
 const pixelWidthInputElement = document.getElementById('pixel-width')
@@ -336,13 +336,16 @@ const netDataRateDisplayElement = document.getElementById('net-data-rate')
 const payloadAllocationDisplayElement = document.getElementById('payload-allocation')
 const framesNeededDisplayElement = document.getElementById('frames-needed')
 
+let paletteList = []
+let activePalette = null
+let activePaletteLi = null
 let streamPaletteID = '6'
 let streamPaletteBitLength = 6
 let pixelWidth = 24
 let blockHeight = 45
 let blockWidth = 80
 let framesPerSecond = 30
-
+//todo remove 24 bit from list when vid selected.  when pic -> vid, change palette to 6 bit
 
 const resultRender = () => {
     const calibratorBlockOverhead = blockHeight + blockWidth - 1
@@ -397,6 +400,52 @@ framesPerSecondInputElement.addEventListener('input', () => {
     resultRender()
 })
 
+const generatePaletteLi = (palette) => {
+    let newLi = document.createElement('li')
+    newLi.setAttribute('palette-id', palette.palette_id)
+    newLi.addEventListener('click', () => {
+        if (activePaletteLi){
+            activePaletteLi.classList.remove('active')
+        }
+        activePaletteLi = newLi
+        newLi.classList.add('active')
+        retrieved = paletteList.filter(obj => {
+            return obj.palette_id === palette.palette_id
+        })[0]
+        console.log(retrieved)
+        if (retrieved !== activePalette) {
+            activePalette = retrieved
+            streamPaletteID = retrieved.palette_id
+            streamPaletteBitLength = retrieved.bit_length
+            paletteNameDisplayElement.textContent = retrieved.name
+            paletteBitLengthDisplayElement.textContent = `${streamPaletteBitLength} ${bitorBits(streamPaletteBitLength)}
+             per block`
+            resultRender()
+        }
+    })
+    const newContent = document.createTextNode(palette.name)
+    newLi.appendChild(newContent)
+    paletteListElement.appendChild(newLi)
+}
+
+const getPaletteList = () => {
+    axios.get('http://localhost:7218/palettes').then((response) => {
+        paletteList = response.data
+        sortPaletteList()
+        paletteList.forEach(palette => {
+            generatePaletteLi(palette)
+        })
+
+        // Setting to 6 Bit Default palette
+        // activePalette = paletteList[0]
+        // loadActivePalette(activePalette)
+        // activePaletteLi = document.querySelector('[palette-id="1"]')
+        // activePaletteLi.classList.add('active')
+
+    })
+}
+
+getPaletteList()
 
 /*
     *** Step 4/5 -- Encryption Configuration ***
@@ -406,7 +455,6 @@ let fileMaskEnabled = false
 let scryptN = 14
 let scryptR = 8
 let scryptP = 1
-//remove 24 bit from list when vid selected.  when pic -> vid, change palette to 6 bit
 
 /*
     *** Step 5/5 -- Rendering ***
@@ -452,19 +500,30 @@ socket.on('write-done', data => {
     // Signals write is complete
     successSound.play()
     renderTextInfo.textContent = `Write Complete!  Your ${writeModeVideo ? 'video is' : 'frames are'} available here: ${writeSavePath}`
+    stepFiveValid = true
     nextButtonEnable()
     nextButtonElement.textContent = 'Finish'
 })
 
 socket.on('write-error', data => {
     // Signals backend write() failed
-    console.log(data)
     errorSound.play()
     renderTextInfo.classList.add('text-secondary')
-    renderTextInfo.textContent = `Write failure- this can be caused by write parameters, or something else.  Please let 
-    us know in Discord along with what you did, we will investigate and fix this ASAP.` //TODO CHANGE
+    renderTextInfo.textContent = `Write failure- this can be caused by write parameters, or something else.  An error
+    log has been created in your current write path directory.  Please send this to us in Discord along with any other 
+     info, and we will investigate and fix this ASAP.`
+    stepFiveValid = true
     nextButtonEnable()
     nextButtonElement.textContent = 'Finish'
+
+    // Write state
+    const modeState = {stepZeroConfirmed, inputType, inputPath, sizeInBytes, writeMode, compressedEnabled, streamName,
+    streamDescription, nameLengthValid, nameValid, descriptionValid, streamPaletteID, streamPaletteBitLength,
+    pixelWidth, blockHeight, blockWidth, framesPerSecond, cryptoKey, fileMaskEnabled, scryptN, scryptR, scryptP,
+    writeSavePath}
+
+    ipcRenderer.send('writeError', {modeState: {...modeState}, path: data.write_path, backendError:
+        data.error})
 })
 
 backButtonElement.addEventListener('click', () => backButtonHandler())
