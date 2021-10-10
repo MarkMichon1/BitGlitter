@@ -240,9 +240,17 @@
                     </span>  Encryption Key
                 </th>
                 <td>
-                    <div><input type="text" class="form-control" id="encryption-key" placeholder="Your key here"></div>
                     <div>
                         <span id="encryption-errors" class="text-danger hidden">Can only use valid ASCII characters.</span>
+                    </div>
+                    <div class="dont-wrap">
+                        <input type="password" class="form-control form-inline" id="encryption-key" placeholder="Your key here">
+                        <span>
+                            <i id="password-toggle" class="bi bi-eye-slash"></i>
+                            <span id="password-span" class="hidden">
+                                <span id="password-length"></span> / ∞
+                            </span>
+                        </span>
                     </div>
                 </td>
             </tr>
@@ -266,7 +274,7 @@
                     </span>  scrypt N value
                 </th>
                 <td>
-                    <input type="number" min="1" id="scrypt-n">
+                    <input type="number" min="1" id="scrypt-n" value="14">
                 </td>
             </tr>
             <tr>
@@ -276,7 +284,7 @@
                     </span>  scrypt R value
                 </th>
                 <td>
-                    <input type="number" min="1" id="scrypt-r">
+                    <input type="number" min="1" id="scrypt-r" value="8">
                 </td>
             </tr>
             <tr>
@@ -286,7 +294,7 @@
                     </span>  scrypt P value
                 </th>
                 <td>
-                    <input type="number" min="1" id="scrypt-p">
+                    <input type="number" min="1" id="scrypt-p" value="1">
                 </td>
             </tr>
             </tbody>

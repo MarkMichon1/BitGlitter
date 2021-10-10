@@ -2,8 +2,9 @@ const axios = require('axios')
 const { ipcRenderer, remote } = require('electron')
 const io = require("socket.io-client");
 
+const { appVersion } = require('../../../config')
 const display = require('../../utilities/display');
-const { bitorBits, humanizeFileSize } = require("../../utilities/display");
+const { bitorBits, frameorFrames, humanizeFileSize, checkStringASCII} = require("../../utilities/display");
 const { sortPaletteList } = require('../../utilities/palette')
 
 /*
@@ -85,6 +86,7 @@ const stepThreeSegmentLoad = () => {
     currentStep = 3
     stepTitleElement.textContent = 'Step 3/5 -- Render Configuration'
     stepThreeElement.classList.remove('no-display')
+    nextButtonElement.textContent = 'Next'
     if (stepThreeValid) {
         nextButtonEnable()
     } else {
@@ -95,6 +97,7 @@ const stepFourSegmentLoad = () => {
     currentStep = 4
     stepTitleElement.textContent = 'Step 4/5 -- Encryption Configuration'
     stepFourElement.classList.remove('no-display')
+    nextButtonElement.textContent = 'Start'
 }
 const stepFiveSegmentLoad = () => {
     currentStep = 5
@@ -246,7 +249,7 @@ const descriptionInputElement = document.getElementById('stream-description')
 const descriptionErrorsElement = document.getElementById('description-errors')
 
 let writeMode = 'video'
-let compressedEnabled = true
+let compressionEnabled = true
 let streamName = ''
 let streamDescription = ''
 
@@ -263,7 +266,7 @@ imageRadioButtonElement.addEventListener('change', () => {
     resultRender()
 })
 compressionEnabledCheckboxElement.addEventListener('click', () => {
-    compressedEnabled = compressionEnabledCheckboxElement.checked
+    compressionEnabled = compressionEnabledCheckboxElement.checked
 })
 
 const stepTwoValidate = () => {
@@ -345,7 +348,6 @@ let pixelWidth = 24
 let blockHeight = 45
 let blockWidth = 80
 let framesPerSecond = 30
-//todo remove 24 bit from list when vid selected.  when pic -> vid, change palette to 6 bit
 
 const resultRender = () => {
     const calibratorBlockOverhead = blockHeight + blockWidth - 1
@@ -371,7 +373,7 @@ const resultRender = () => {
     axios.post('http://localhost:7218/write/frame-estimator', {block_height: blockHeight, block_width:
         blockWidth, size_in_bytes: sizeInBytes, bit_length: streamPaletteBitLength, output_mode: writeMode})
         .then((response) => {
-        framesNeededDisplayElement.textContent = `${response.data.total_frames.toLocaleString()} frame(s)`
+        framesNeededDisplayElement.textContent = `${response.data.total_frames.toLocaleString()} ${frameorFrames(response.data.total_frames)}`
     })
     frameDimensionsDisplayElement.textContent = `${(blockHeight * pixelWidth).toLocaleString()}px H / ${(blockWidth * pixelWidth).toLocaleString()}px W`
     blockDimensionsDisplayElement.textContent = `${blockHeight.toLocaleString()} blocks H /  ${blockWidth.toLocaleString()} blocks W = ${(blockWidth * blockHeight).toLocaleString()} total blocks`
@@ -388,7 +390,6 @@ pixelWidthInputElement.addEventListener('input', () => {
 })
 blockHeightInputElement.addEventListener('input', () => {
     blockHeight = Number.parseInt(blockHeightInputElement.value, 10)
-    console.log(blockHeight)
     resultRender()
 })
 blockWidthInputElement.addEventListener('input', () => {
@@ -412,7 +413,6 @@ const generatePaletteLi = (palette) => {
         retrieved = paletteList.filter(obj => {
             return obj.palette_id === palette.palette_id
         })[0]
-        console.log(retrieved)
         if (retrieved !== activePalette) {
             activePalette = retrieved
             streamPaletteID = retrieved.palette_id
@@ -437,10 +437,11 @@ const getPaletteList = () => {
         })
 
         // Setting to 6 Bit Default palette
-        // activePalette = paletteList[0]
-        // loadActivePalette(activePalette)
-        // activePaletteLi = document.querySelector('[palette-id="1"]')
-        // activePaletteLi.classList.add('active')
+        activePaletteLi = document.querySelector('[palette-id="6"]')
+        activePaletteLi.classList.add('active')
+        streamPaletteID = '6'
+        streamPaletteBitLength = 6
+        resultRender()
 
     })
 }
@@ -450,11 +451,71 @@ getPaletteList()
 /*
     *** Step 4/5 -- Encryption Configuration ***
 */
+const cryptoKeyInputElement = document.getElementById('encryption-key')
+const passwordVisibilityElement = document.getElementById('password-toggle')
+const passwordSpanElement = document.getElementById('password-span')
+const passwordLengthElement = document.getElementById('password-length')
+const cryptoErrorElement = document.getElementById('encryption-errors')
+const fileMaskingEnabledElement = document.getElementById('file-masking-enabled')
+const scryptNElement = document.getElementById('scrypt-n')
+const scryptRElement = document.getElementById('scrypt-r')
+const scryptPElement = document.getElementById('scrypt-p')
+let showPassword = false
+
 let cryptoKey = ''
 let fileMaskEnabled = false
 let scryptN = 14
 let scryptR = 8
 let scryptP = 1
+
+cryptoKeyInputElement.addEventListener('input', () => {
+    cryptoKey = cryptoKeyInputElement.value
+    if (cryptoKey) {
+        passwordSpanElement.classList.remove('hidden')
+        passwordLengthElement.textContent = cryptoKey.length
+    } else {
+        passwordSpanElement.classList.add('hidden')
+    }
+
+    if (checkStringASCII(cryptoKey, true)) {
+        nextButtonEnable()
+        stepFiveValid = true
+        cryptoErrorElement.classList.add('hidden')
+    } else {
+        nextButtonDisable()
+        stepFiveValid = false
+        cryptoErrorElement.classList.remove('hidden')
+    }
+})
+
+passwordVisibilityElement.addEventListener('click', () => {
+    if (showPassword) {
+        cryptoKeyInputElement.type = 'password'
+        passwordVisibilityElement.classList.remove('bi-eye')
+        passwordVisibilityElement.classList.add('bi-eye-slash')
+    } else {
+        cryptoKeyInputElement.type = 'text'
+        passwordVisibilityElement.classList.remove('bi-eye-slash')
+        passwordVisibilityElement.classList.add('bi-eye')
+    }
+    showPassword = !showPassword
+})
+
+fileMaskingEnabledElement.addEventListener('click', () => {
+    fileMaskEnabled = fileMaskingEnabledElement.checked
+})
+
+scryptNElement.addEventListener('input', () => {
+    scryptN = scryptNElement.value
+})
+
+scryptRElement.addEventListener('input', () => {
+    scryptR = scryptRElement.value
+})
+
+scryptPElement.addEventListener('input', () => {
+    scryptP = scryptPElement.value
+})
 
 /*
     *** Step 5/5 -- Rendering ***
@@ -469,9 +530,24 @@ const socket = io('ws://localhost:7218')
 let writeSavePath = null
 
 const writeStart = () => {
-    axios.post('http://localhost:7218/write/', {data: true}) //feed arguments into this
-    console.log('Placeholder to start write')
-
+    axios.post('http://localhost:7218/write/', {
+        input_path: inputPath,
+        stream_name: streamName,
+        stream_description: streamDescription,
+        output_mode: writeMode,
+        compression_enabled: compressionEnabled,
+        file_mask_enabled: fileMaskEnabled,
+        encryption_key: cryptoKey,
+        scrypt_n: scryptN,
+        scrypt_r: scryptR,
+        scrypt_p: scryptP,
+        stream_palette_id: streamPaletteID,
+        pixel_width: pixelWidth,
+        block_height: blockHeight,
+        block_width: blockWidth,
+        frames_per_second: framesPerSecond,
+        bg_version: appVersion
+    })
 }
 
 socket.on('write-preprocess', data => {
@@ -517,7 +593,7 @@ socket.on('write-error', data => {
     nextButtonElement.textContent = 'Finish'
 
     // Write state
-    const modeState = {stepZeroConfirmed, inputType, inputPath, sizeInBytes, writeMode, compressedEnabled, streamName,
+    const modeState = {stepZeroConfirmed, inputType, inputPath, sizeInBytes, writeMode, compressedEnabled: compressionEnabled, streamName,
     streamDescription, nameLengthValid, nameValid, descriptionValid, streamPaletteID, streamPaletteBitLength,
     pixelWidth, blockHeight, blockWidth, framesPerSecond, cryptoKey, fileMaskEnabled, scryptN, scryptR, scryptP,
     writeSavePath}

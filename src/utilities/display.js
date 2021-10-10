@@ -46,4 +46,11 @@ const bitorBits = (quantity) => {
     return 'bits'
 }
 
-module.exports = { abridgedPath, bitorBits, bitsToBytes, checkStringASCII, humanizeFileSize }
+const frameorFrames = (quantity) => {
+    if (quantity === 1) {
+        return 'frame'
+    }
+    return 'frames'
+}
+
+module.exports = { abridgedPath, bitorBits, bitsToBytes, checkStringASCII, frameorFrames, humanizeFileSize }
