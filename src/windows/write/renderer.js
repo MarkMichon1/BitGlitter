@@ -3,8 +3,8 @@ const { ipcRenderer, remote } = require('electron')
 const io = require("socket.io-client");
 
 const { appVersion } = require('../../../config')
-const display = require('../../utilities/display');
-const { bitorBits, frameorFrames, humanizeFileSize, checkStringASCII} = require("../../utilities/display");
+const { abridgedPath, bitorBits, bitsToBytes, checkStringASCII, frameorFrames,
+    humanizeFileSize } = require("../../utilities/display");
 const { sortPaletteList } = require('../../utilities/palette')
 
 /*
@@ -29,8 +29,8 @@ const backButtonElement = document.getElementById('back-button')
 const nextButtonElement = document.getElementById('next-button')
 
 let stepZeroValid = true
-let stepOneValid = true //todo false
-let stepTwoValid = true //todo false
+let stepOneValid = false
+let stepTwoValid = false
 let stepThreeValid = true
 let stepFourValid = true
 let stepFiveValid = false // Signalling rendering complete
@@ -210,7 +210,7 @@ inputPathButtonElement.addEventListener('click', () => {
 ipcRenderer.on('updateWriteInput', (event, data) => {
     nextButtonDisable()
     inputPath = data
-    selectedPathElement.textContent = display.abridgedPath(inputPath)
+    selectedPathElement.textContent = abridgedPath(inputPath)
     inputStatusTextElement.textContent = 'Calculating...'
     spinnerElement.classList.remove('hidden')
     inputPathDisplayElement.classList.remove('hidden')
@@ -295,7 +295,7 @@ nameInputElement.addEventListener('input', () => {
         } else if (streamName.length > 150) {
             nameLengthElement.className = 'text-danger'
         }
-        if (display.checkStringASCII(streamName)) {
+        if (checkStringASCII(streamName)) {
             nameValid = true
             nameErrorsElement.classList.add('hidden')
         } else {
@@ -308,7 +308,7 @@ nameInputElement.addEventListener('input', () => {
 
 descriptionInputElement.addEventListener('input', () => {
     streamDescription = descriptionInputElement.value
-    if (display.checkStringASCII(streamDescription, extra_chars=true)) {
+    if (checkStringASCII(streamDescription, true)) {
         descriptionValid = true
         descriptionErrorsElement.classList.add('hidden')
     } else {
@@ -366,8 +366,8 @@ const resultRender = () => {
         blocksLeft -= (calibratorBlockOverhead + initializerBlockOverhead)
     }
 
-    const rawDataPerFrame = display.bitsToBytes(blocksLeft * streamPaletteBitLength)
-    const netDataPerFrame = display.bitsToBytes((blocksLeft * streamPaletteBitLength) - frameHeaderBitOverhead)
+    const rawDataPerFrame = bitsToBytes(blocksLeft * streamPaletteBitLength)
+    const netDataPerFrame = bitsToBytes((blocksLeft * streamPaletteBitLength) - frameHeaderBitOverhead)
     const payloadAllocation = (netDataPerFrame / rawDataPerFrame) * 100
 
     axios.post('http://localhost:7218/write/frame-estimator', {block_height: blockHeight, block_width:
@@ -377,10 +377,10 @@ const resultRender = () => {
     })
     frameDimensionsDisplayElement.textContent = `${(blockHeight * pixelWidth).toLocaleString()}px H / ${(blockWidth * pixelWidth).toLocaleString()}px W`
     blockDimensionsDisplayElement.textContent = `${blockHeight.toLocaleString()} blocks H /  ${blockWidth.toLocaleString()} blocks W = ${(blockWidth * blockHeight).toLocaleString()} total blocks`
-    rawDataPerFrameDisplayElement.textContent = `${display.humanizeFileSize(rawDataPerFrame)}`
-    netDataPerFrameDisplayElement.textContent = `${display.humanizeFileSize(netDataPerFrame)}`
-    rawDataRateDisplayElement.textContent = `${display.humanizeFileSize(rawDataPerFrame * framesPerSecond)}/s`
-    netDataRateDisplayElement.textContent = `${display.humanizeFileSize(netDataPerFrame * framesPerSecond)}/s`
+    rawDataPerFrameDisplayElement.textContent = `${humanizeFileSize(rawDataPerFrame)}`
+    netDataPerFrameDisplayElement.textContent = `${humanizeFileSize(netDataPerFrame)}`
+    rawDataRateDisplayElement.textContent = `${humanizeFileSize(rawDataPerFrame * framesPerSecond)}/s`
+    netDataRateDisplayElement.textContent = `${humanizeFileSize(netDataPerFrame * framesPerSecond)}/s`
     payloadAllocationDisplayElement.textContent = `${payloadAllocation.toFixed(2)}%`
 }
 
@@ -528,6 +528,7 @@ const errorSound = new Audio('../../../assets/mp3/error.mp3')
 const socket = io('ws://localhost:7218')
 
 let writeSavePath = null
+let successText = null
 
 const writeStart = () => {
     axios.post('http://localhost:7218/write/', {
@@ -557,14 +558,16 @@ socket.on('write-preprocess', data => {
 
 socket.on('write-render', data => {
     // Displays frame render progress and manipulates progress bar
-    subdividedMessage = data.split('|')
-    renderTextInfo.textContent = `Generating frame ${subdividedMessage[0]}/${subdividedMessage[1]}...`
+    renderTextInfo.textContent = `Generating frame ${data[0]}/${data[1]}...`
+    renderProgressBar.textContent = `${data[2]} %`
+    renderProgressBar.style.width = `${data[2]}%`
 })
 
 socket.on('write-video-render', data => {
-    // Displays frame render progress and manipulates progress bar
-    subdividedMessage = data.split('|')
-    renderTextInfo.textContent = `Rendering video frame ${subdividedMessage[0]}/${subdividedMessage[1]}...`
+    // Displays VIDEO render progress and manipulates progress bar
+    renderTextInfo.textContent = `Rendering video frame ${data[0]}/${data[1]}...`
+    renderProgressBar.textContent = `${data[2]} %`
+    renderProgressBar.style.width = `${data[2]}%`
 })
 
 socket.on('write-save-path', data => {
@@ -572,10 +575,16 @@ socket.on('write-save-path', data => {
 
 })
 
-socket.on('write-done', data => {
+socket.on('write-done', () => {
     // Signals write is complete
     successSound.play()
-    renderTextInfo.textContent = `Write Complete!  Your ${writeModeVideo ? 'video is' : 'frames are'} available here: ${writeSavePath}`
+    if (writeMode === 'video') {
+        successText = 'video is'
+    } else {
+        successText = 'frames are'
+    }
+    renderTextInfo.classList.add('text-success')
+    renderTextInfo.textContent = `Write Complete!  Your ${successText} available here: ${writeSavePath}`
     stepFiveValid = true
     nextButtonEnable()
     nextButtonElement.textContent = 'Finish'

@@ -40,6 +40,7 @@ body.hide-overflow {
     width: 17px;
     height: 17px;
 }
+
 .loading-spinner:after {
     content: " ";
     display: block;
@@ -52,6 +53,7 @@ body.hide-overflow {
     border-color: #fff transparent #fff transparent;
     animation: spinner 1.2s infinite;
 }
+
 @keyframes spinner {
     0% {
         transform: rotate(0);
@@ -64,4 +66,17 @@ body.hide-overflow {
     100% {
         transform: rotate(1800deg);
     }
+}
+
+div.button-box {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+}
+
+i#password-toggle {
+    margin-right: 10px;
+}
+
+i#password-toggle:hover {
+    cursor: pointer;
 }

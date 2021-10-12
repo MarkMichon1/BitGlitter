@@ -5,8 +5,67 @@
     <link rel="stylesheet" href="../../../assets/css/halfmoon.min.css">
     <link rel="stylesheet" href="../../../assets/css/helperClasses.css">
     <script src="../../../assets/js/halfmoon.min.js" defer></script>
+    <script src="renderer.js" defer></script>
 </head>
 <body data-set-preferred-mode-onload="true">
-read placeholder
+<div class="container no-select">
+    <h1>Read BitGlitter Stream</h1>
+    <h2 id="step-title"></h2>
+    <div class="no-display" id="step-one">
+        <table class="table">
+            <tbody>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="Choose whether you're read a single video, or a set of images.">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  I am decoding...
+                </th>
+                <td>
+                    <div>
+                        <div class="form-group">
+                            <div class="custom-radio">
+                                <input type="radio" name="input-type" id="radio-single-file" value="single-video" required="required">
+                                <label for="radio-single-file">A single video</label>
+                            </div>
+                            <div class="custom-radio">
+                                <input type="radio" name="input-type" id="radio-directory" value="directory" required="required">
+                                <label for="radio-directory">A set of images</label>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Payload Select
+                </th>
+                <td class="text-right">
+                    <div>
+                        <button class="btn btn-primary" type="button" id="input-path-button" disabled="disabled">Select Encoded File(s)</button>
+                    </div>
+                    <div id="selected-path" class="font-weight-bold"></div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="no-display" id="step-two">
+
+    </div>
+    <div class="no-display" id="step-three">
+
+    </div>
+    <div class="no-display" id="step-four">
+        reading...
+    </div>
+    <div class="no-display" id="metadata-prompt">
+        metadata
+    </div>
+    <div class="mt-20 button-box">
+        <button class="btn" type="button" id="cancel-button">Cancel</button>
+        <button class="btn" type="button" disabled="disabled" id="back-button">Back</button>
+        <button class="btn btn-primary" type="button" disabled="disabled" id="next-button">Next</button>
+    </div>
+</div>
 </body>
 </html>

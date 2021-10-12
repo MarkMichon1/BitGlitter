@@ -1,5 +1,5 @@
 const humanizeFileSize = (sizeInBytes) => {
-    if (0 < sizeInBytes && sizeInBytes < 1000) {
+    if (sizeInBytes < 1000) {
         return `${sizeInBytes} B`
     } else if (1000 <= sizeInBytes && sizeInBytes < 1000 ** 2) {
         return `${(sizeInBytes / 1000).toFixed(2)} KB`
@@ -39,7 +39,7 @@ const checkStringASCII = (string_input, extra_chars=false) => {
 
 const bitsToBytes = (bits) => Math.floor(bits / 8)
 
-const bitorBits = (quantity) => {
+const bitOrBits = (quantity) => {
     if (quantity === 1) {
         return 'bit'
     }
@@ -53,4 +53,4 @@ const frameorFrames = (quantity) => {
     return 'frames'
 }
 
-module.exports = { abridgedPath, bitorBits, bitsToBytes, checkStringASCII, frameorFrames, humanizeFileSize }
+module.exports = { abridgedPath, bitorBits: bitOrBits, bitsToBytes, checkStringASCII, frameorFrames, humanizeFileSize }

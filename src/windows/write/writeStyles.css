@@ -32,11 +32,3 @@ li.active:hover {
     font-weight: bold;
     background: #7f7c82;
 }
-
-i#password-toggle {
-    margin-right: 10px;
-}
-
-i#password-toggle:hover {
-    cursor: pointer;
-}
