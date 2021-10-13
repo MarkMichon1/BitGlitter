@@ -271,10 +271,10 @@ compressionEnabledCheckboxElement.addEventListener('click', () => {
 
 const stepTwoValidate = () => {
     if (nameLengthValid && nameValid && descriptionValid) {
-        stepOneValid = true
+        stepTwoValid = true
         nextButtonEnable()
     } else {
-        stepOneValid = false
+        stepTwoValid = false
         nextButtonDisable()
     }
 }
@@ -355,10 +355,12 @@ const resultRender = () => {
     const frameHeaderBitOverhead = 352
     let blocksLeft = blockWidth * blockHeight
     if (blocksLeft < 1500) {
+        stepThreeValid = false
         nextButtonDisable()
         blockErrorsDisplayElement.classList.remove('hidden')
     } else {
         blockErrorsDisplayElement.classList.add('hidden')
+        stepThreeValid = true
         nextButtonEnable()
     }
 

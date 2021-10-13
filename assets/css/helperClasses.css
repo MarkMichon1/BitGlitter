@@ -80,3 +80,13 @@ i#password-toggle {
 i#password-toggle:hover {
     cursor: pointer;
 }
+
+.img-center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    pointer-events: none;
+}

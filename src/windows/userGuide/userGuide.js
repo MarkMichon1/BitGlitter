@@ -5,8 +5,10 @@ function createUserGuideWindow (parentWindow) {
     let userGuideWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'User Manual',
+        useContentSize: true,
         width: 900,
         height: 700,
+        resizable: true,
         icon: './assets/icons/icon.png',
         parent: parentWindow,
         modal: true

@@ -16,10 +16,9 @@ function createMainWindow () {
     let mainWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'BitGlitter',
-        // width: operatingSystem === 'linux' ? 800 : 840,
-        // height: operatingSystem === 'linux' ? 625 : 660,
-        width: 815,
-        height: 660,
+        useContentSize: true,
+        width: 800,
+        height: 600,
         resizable: !productionMode,
         icon: './assets/icons/icon.png',
         darkTheme: true,

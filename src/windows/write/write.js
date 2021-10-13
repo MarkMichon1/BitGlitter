@@ -6,6 +6,7 @@ function createWriteWindow (parentWindow) {
     let writeWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Write Stream',
+        useContentSize: true,
         width: 800,
         height: 625,
         resizable: !productionMode,

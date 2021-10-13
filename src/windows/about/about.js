@@ -5,8 +5,9 @@ function createAboutWindow (parentWindow) {
     let aboutWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'About BitGlitter',
+        useContentSize: true,
         width: 650,
-        height: 285,
+        height: 380,
         resizable: !productionMode,
         icon: './assets/icons/icon.png',
         parent: parentWindow,
