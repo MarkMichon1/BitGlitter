@@ -5,10 +5,11 @@ function createBase64ImportWindow (parentWindow) {
     let base64ImportWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Import Palette',
+        useContentSize: true,
         width: 585,
-        height: 200,
+        height: 205,
         resizable: !productionMode,
-        icon: '',
+        icon: './assets/icons/icon.png',
         parent: parentWindow,
         modal: true,
         webPreferences: {

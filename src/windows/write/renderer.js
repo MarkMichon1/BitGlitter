@@ -65,11 +65,7 @@ const stepOneSegmentLoad = () => {
     } else {
         backButtonDisable()
     }
-    if (stepOneValid) {
-        nextButtonEnable()
-    } else {
-        nextButtonDisable()
-    }
+    stepOneValidate()
 }
 const stepTwoSegmentLoad = () => {
     currentStep = 2
@@ -260,10 +256,12 @@ let descriptionValid = true
 videoRadioButtonElement.addEventListener('change', () => {
     writeMode = 'video'
     resultRender()
+    stepTwoValidate()
 })
 imageRadioButtonElement.addEventListener('change', () => {
     writeMode = 'image'
     resultRender()
+    stepTwoValidate()
 })
 compressionEnabledCheckboxElement.addEventListener('click', () => {
     compressionEnabled = compressionEnabledCheckboxElement.checked
@@ -350,6 +348,9 @@ let blockWidth = 80
 let framesPerSecond = 30
 
 const resultRender = () => {
+    if (currentStep !== 2 || currentStep !==3) {
+        return
+    }
     const calibratorBlockOverhead = blockHeight + blockWidth - 1
     const initializerBlockOverhead = 580
     const frameHeaderBitOverhead = 352
@@ -524,6 +525,8 @@ scryptPElement.addEventListener('input', () => {
 */
 const renderTextInfo = document.getElementById('render-text-info')
 const renderProgressBar = document.getElementById('render-progress-bar')
+const streamSHAHolderElement = document.getElementById('stream-sha-holder')
+const streamSHAValueElement = document.getElementById('stream-sha')
 const successSound = new Audio('../../../assets/mp3/success.mp3')
 const errorSound = new Audio('../../../assets/mp3/error.mp3')
 
@@ -531,6 +534,7 @@ const socket = io('ws://localhost:7218')
 
 let writeSavePath = null
 let successText = null
+let streamSHA256 = null
 
 const writeStart = () => {
     axios.post('http://localhost:7218/write/', {
@@ -572,6 +576,11 @@ socket.on('write-video-render', data => {
     renderProgressBar.style.width = `${data[2]}%`
 })
 
+socket.on('stream-sha', data => {
+    // Displays some preprocess data prior to rendering
+    streamSHA256 = data
+})
+
 socket.on('write-save-path', data => {
     writeSavePath = data
 
@@ -588,6 +597,8 @@ socket.on('write-done', () => {
     renderTextInfo.classList.add('text-success')
     renderTextInfo.textContent = `Write Complete!  Your ${successText} available here: ${writeSavePath}`
     stepFiveValid = true
+    streamSHAValueElement.textContent = streamSHA256
+    streamSHAHolderElement.classList.remove('hidden')
     nextButtonEnable()
     nextButtonElement.textContent = 'Finish'
 })

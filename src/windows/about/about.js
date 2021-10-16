@@ -7,7 +7,7 @@ function createAboutWindow (parentWindow) {
         title: 'About BitGlitter',
         useContentSize: true,
         width: 650,
-        height: 380,
+        height: 390,
         resizable: !productionMode,
         icon: './assets/icons/icon.png',
         parent: parentWindow,

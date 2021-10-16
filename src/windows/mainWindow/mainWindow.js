@@ -18,7 +18,7 @@ function createMainWindow () {
         title: 'BitGlitter',
         useContentSize: true,
         width: 800,
-        height: 600,
+        height: 620,
         resizable: !productionMode,
         icon: './assets/icons/icon.png',
         darkTheme: true,

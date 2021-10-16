@@ -8,7 +8,7 @@ function createCreatePaletteWindow (parentWindow) {
         width: 585,
         height: 430,
         resizable: !productionMode,
-        icon: '',
+        icon: './assets/icons/icon.png',
         parent: parentWindow,
         modal: true,
         webPreferences: {

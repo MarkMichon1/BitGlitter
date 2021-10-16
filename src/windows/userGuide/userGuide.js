@@ -4,7 +4,7 @@ const { operatingSystem, productionMode } = require('../../../config')
 function createUserGuideWindow (parentWindow) {
     let userGuideWindow = new BrowserWindow({
         backgroundColor: '#25282C',
-        title: 'User Manual',
+        title: 'User Guide',
         useContentSize: true,
         width: 900,
         height: 700,

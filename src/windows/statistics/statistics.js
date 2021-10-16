@@ -5,8 +5,9 @@ function createStatisticsWindow (parentWindow) {
     let statisticsWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Statistics',
+        useContentSize: true,
         width: 585,
-        height: 430,
+        height: 445,
         resizable: !productionMode,
         icon: './assets/icons/icon.png',
         parent: parentWindow,

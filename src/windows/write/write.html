@@ -301,10 +301,18 @@
         </table>
     </div>
     <div class="no-display" id="step-five">
-        <p id="render-text-info">Starting...</p>
+        <p id="render-text-info" class="text-center">Starting...</p>
         <div class="progress">
             <div class="progress-bar" role="progressbar" id="render-progress-bar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
+    </div>
+    <div class="text-center mt-10">
+        <p id="stream-sha-holder" class="hidden">
+            <span data-toggle="tooltip" data-title="The stream's unique fingerprint from the files contained">
+                <i class="bi bi-question-circle blue"></i>
+            </span>  SHA-256 hash:
+            <code id="stream-sha" class="can-select code" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted"></code>
+        </p>
     </div>
     <div class="mt-20 button-box">
         <button class="btn" type="button" id="cancel-button">Cancel</button>

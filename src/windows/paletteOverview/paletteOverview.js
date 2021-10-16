@@ -8,8 +8,9 @@ function createPaletteOverviewWindow (parentWindow) {
     let paletteOverviewWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Palettes',
+        useContentSize: true,
         width: 815,
-        height: 625,
+        height: 645,
         resizable: !productionMode,
         icon: './assets/icons/icon.png',
         parent: parentWindow,

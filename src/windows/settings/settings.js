@@ -5,8 +5,9 @@ function createSettingsWindow (parentWindow) {
     let settingsWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Settings',
+        useContentSize: true,
         width: 800,
-        height: 540,
+        height: 560,
         resizable: !productionMode,
         icon: './assets/icons/icon.png',
         parent: parentWindow,
