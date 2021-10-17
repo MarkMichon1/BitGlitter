@@ -10,6 +10,7 @@ const { sortPaletteList } = require('../../utilities/palette')
 /*
     *** Setup Variables ***
 */
+
 const stepTitleElement = document.getElementById('step-title')
 // Step 0/5 and associated elements
 const stepZeroElement = document.getElementById('step-zero')
@@ -39,6 +40,7 @@ let currentStep = null
 /*
     *** Utilities ***
 */
+
 const backButtonEnable = () => backButtonElement.removeAttribute('disabled')
 const backButtonDisable = () => backButtonElement.setAttribute('disabled', 'disabled')
 const nextButtonEnable = () => nextButtonElement.removeAttribute('disabled')
@@ -102,6 +104,7 @@ const stepFiveSegmentLoad = () => {
     backButtonDisable()
     nextButtonDisable()
     nextButtonElement.textContent = 'Rendering...'
+    writeStart()
 }
 
 const stepZeroSegmentHide = () => stepZeroElement.classList.add('no-display')
@@ -149,20 +152,25 @@ const nextButtonHandler = () => {
     } else if (currentStep === 4 && stepFourValid) {
         stepFourSegmentHide()
         stepFiveSegmentLoad()
-        writeStart()
     } else if (currentStep === 5 && stepFiveValid) {
         closeWindow()
     }
 }
 
+backButtonElement.addEventListener('click', () => backButtonHandler())
+nextButtonElement.addEventListener('click', () => nextButtonHandler())
+cancelButtonElement.addEventListener('click', () => closeWindow())
+
 /*
     *** Step 0/5 -- Show Once ***
 */
+
 let stepZeroConfirmed = false
 
 /*
     *** Step 1/5 -- Basic Setup ***
 */
+
 const fileRadioButtonElement = document.getElementById('radio-single-file')
 const directoryRadioButtonElement = document.getElementById('radio-directory')
 const inputPathButtonElement = document.getElementById('input-path-button')
@@ -235,6 +243,7 @@ const stepOneValidate = () => {
 /*
     *** Step 2/5 -- Stream Configuration ***
 */
+
 const videoRadioButtonElement = document.getElementById('radio-video-mode')
 const imageRadioButtonElement = document.getElementById('radio-image-mode')
 const compressionEnabledCheckboxElement = document.getElementById('compression-enabled')
@@ -320,6 +329,7 @@ descriptionInputElement.addEventListener('input', () => {
 /*
     *** Step 3/5 -- Render Configuration ***
 */
+
 const paletteListElement = document.getElementById('palette-list')
 const paletteNameDisplayElement = document.getElementById('palette-name')
 const paletteBitLengthDisplayElement = document.getElementById('palette-bit-length')
@@ -454,6 +464,7 @@ getPaletteList()
 /*
     *** Step 4/5 -- Encryption Configuration ***
 */
+
 const cryptoKeyInputElement = document.getElementById('encryption-key')
 const passwordVisibilityElement = document.getElementById('password-toggle')
 const passwordSpanElement = document.getElementById('password-span')
@@ -523,6 +534,7 @@ scryptPElement.addEventListener('input', () => {
 /*
     *** Step 5/5 -- Rendering ***
 */
+
 const renderTextInfo = document.getElementById('render-text-info')
 const renderProgressBar = document.getElementById('render-progress-bar')
 const streamSHAHolderElement = document.getElementById('stream-sha-holder')
@@ -530,11 +542,11 @@ const streamSHAValueElement = document.getElementById('stream-sha')
 const successSound = new Audio('../../../assets/mp3/success.mp3')
 const errorSound = new Audio('../../../assets/mp3/error.mp3')
 
-const socket = io('ws://localhost:7218')
-
 let writeSavePath = null
 let successText = null
 let streamSHA256 = null
+
+const socket = io('ws://localhost:7218')
 
 const writeStart = () => {
     axios.post('http://localhost:7218/write/', {
@@ -624,9 +636,9 @@ socket.on('write-error', data => {
         data.error})
 })
 
-backButtonElement.addEventListener('click', () => backButtonHandler())
-nextButtonElement.addEventListener('click', () => nextButtonHandler())
-cancelButtonElement.addEventListener('click', () => closeWindow())
+/*
+    *** Start ***
+*/
 
 // Loading first step, depending on whether the 'run once screen has previously appeared
 axios.get('http://localhost:7218/write/show-once').then((response) =>

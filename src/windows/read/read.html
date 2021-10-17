@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../../assets/css/bootstrap-icons.css">
     <link rel="stylesheet" href="../../../assets/css/halfmoon.min.css">
     <link rel="stylesheet" href="../../../assets/css/helperClasses.css">
     <script src="../../../assets/js/halfmoon.min.js" defer></script>
@@ -11,6 +12,7 @@
 <div class="container no-select">
     <h1>Read BitGlitter Stream</h1>
     <h2 id="step-title"></h2>
+    <!-- 1/4 Encoded File Select -->
     <div class="no-display" id="step-one">
         <table class="table">
             <tbody>
@@ -24,12 +26,12 @@
                     <div>
                         <div class="form-group">
                             <div class="custom-radio">
-                                <input type="radio" name="input-type" id="radio-single-file" value="single-video" required="required">
-                                <label for="radio-single-file">A single video</label>
+                                <input type="radio" name="input-type" id="radio-video-select" value="single-video" required="required" checked>
+                                <label for="radio-video-select">A single video</label>
                             </div>
                             <div class="custom-radio">
-                                <input type="radio" name="input-type" id="radio-directory" value="directory" required="required">
-                                <label for="radio-directory">A set of images</label>
+                                <input type="radio" name="input-type" id="radio-images-select" value="directory" required="required">
+                                <label for="radio-images-select">A set of images</label>
                             </div>
                         </div>
                     </div>
@@ -41,30 +43,245 @@
                 </th>
                 <td class="text-right">
                     <div>
-                        <button class="btn btn-primary" type="button" id="input-path-button" disabled="disabled">Select Encoded File(s)</button>
+                        <button class="btn btn-primary" type="button" id="input-path-button">Select Encoded File(s)</button>
                     </div>
-                    <div id="selected-path" class="font-weight-bold"></div>
+                    <div id="path-file-count" class="font-weight-bold"></div>
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
+    <!-- 2/4 Read Configuration -->
     <div class="no-display" id="step-two">
-
+        <p>Check out the user guide for more info on what these do!</p>
+        <table class="table">
+            <tbody>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="Pause when metadata loaded.  Highly recommended unless you absolutely trust sender.">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  Stop at Metadata Load
+                </th>
+                <td class="text-right"><input type="checkbox" id="stop-at-metadata-check" checked></td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="Unpackage as many files as possible at end of read sequence (can be ran later)">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  Unpackage Files
+                </th>
+                <td class="text-right"><input type="checkbox" id="unpackage-files-check" checked></td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="Remove all stream data and meta information upon 100% of stream completion">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  Auto-Delete Finished Stream Data
+                </th>
+                <td class="text-right"><input type="checkbox" id="auto-delete-check" checked></td>
+            </tr>
+            </tbody>
+        </table>
     </div>
+    <!-- 3/4 Decryption -->
     <div class="no-display" id="step-three">
-
+        <p>If you know that this stream is encrypted, you may enter the decryption key here.  No worries if it is encrypted and you get these values wrong- you can always change them again and retry in the <strong>Saved Streams</strong> window.</p>
+        <table class="table">
+            <tbody>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="Accepts all ASCII characters">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  Decryption Key
+                </th>
+                <td>
+                    <div>
+                        <span id="decryption-errors" class="text-danger hidden">Can only use valid ASCII characters.</span>
+                    </div>
+                    <div class="dont-wrap">
+                        <input type="password" class="form-control form-inline" id="decryption-key" placeholder="Decryption Key (if used)">
+                        <span>
+                            <i id="password-toggle" class="bi bi-eye-slash"></i>
+                        </span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="2 ** supplied value.  Don't touch unless the sender used different values!">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  scrypt N value
+                </th>
+                <td>
+                    <input type="number" min="1" id="scrypt-n" value="14">
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="Don't touch unless the sender used different values!">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  scrypt R value
+                </th>
+                <td>
+                    <input type="number" min="1" id="scrypt-r" value="8">
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="Don't touch unless the sender used different values!">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  scrypt P value
+                </th>
+                <td>
+                    <input type="number" min="1" id="scrypt-p" value="1">
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
+    <!-- 4/4 Reading... -->
     <div class="no-display" id="step-four">
-        reading...
+        <div class="text-center mt-10">
+            <p id="read-text-info" class="text-center">Starting...</p>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" id="read-progress-bar" style="width: 0%" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <p id="stream-sha-holder" class="hidden">
+                <span data-toggle="tooltip" data-title="The stream's unique fingerprint from the files contained">
+                    <i class="bi bi-question-circle blue"></i>
+                </span>  SHA-256 hash:
+                <code id="stream-sha-read" class="can-select code" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted"></code>
+            </p>
+        </div>
     </div>
+    <!-- 5/4 Metadata Prompt -->
     <div class="no-display" id="metadata-prompt">
-        metadata
+        <div>This data was decoded from the stream.  Check it out- you can either continue reading the stream, or can cancel it.</div>
+        <div class="text-center mt-10">
+            <p>
+                <span data-toggle="tooltip" data-title="The stream's unique fingerprint from the files contained">
+                    <i class="bi bi-question-circle blue"></i>
+                </span>  SHA-256 hash:
+                <code id="stream-sha-meta" class="can-select code" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</code>
+            </p>
+        </div>
+        <table class="table">
+            <tr>
+                <th>
+                    Stream Name
+                </th>
+                <td>
+                    <div id="stream-name" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Stream Description
+                </th>
+                <td>
+                    <div id="stream-description" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Payload Size
+                </th>
+                <td>
+                    <div id="payload-size" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Total Frames
+                </th>
+                <td>
+                    <div id="total-frames" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Time Created
+                </th>
+                <td>
+                    <div id="time-created" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Compressed Payload?
+                </th>
+                <td>
+                    <div id="is-compressed" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Encrypted Payload?
+                </th>
+                <td>
+                    <div id="is-encrypted" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    File Mask Enabled?
+                </th>
+                <td>
+                    <div id="is-using-file-mask" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Stream Palette Used
+                </th>
+                <td>
+                    <div id="stream-palette-used" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Block Height
+                </th>
+                <td>
+                    <div id="block-height" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Block Width
+                </th>
+                <td>
+                    <div id="block-width" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="What version of the software was used to create this stream">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  BitGlitter Version
+                </th>
+                <td>
+                    <div id="bg-version-used" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="(DEV) What protocol version was used in the stream">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  Protocol Version
+                </th>
+                <td>
+                    <div id="protocol-version" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+        </table>
+        <h3 id="manifest-title">File Manifest:</h3>
+        <div id="manifest-anchor">---</div>
     </div>
     <div class="mt-20 button-box">
         <button class="btn" type="button" id="cancel-button">Cancel</button>
-        <button class="btn" type="button" disabled="disabled" id="back-button">Back</button>
-        <button class="btn btn-primary" type="button" disabled="disabled" id="next-button">Next</button>
+        <button class="btn ml-10" type="button" disabled="disabled" id="back-button">Back</button>
+        <button class="btn btn-primary ml-10" type="button" disabled="disabled" id="next-button">Next</button>
     </div>
 </div>
 </body>

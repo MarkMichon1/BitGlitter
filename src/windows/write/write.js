@@ -62,7 +62,7 @@ function createWriteWindow (parentWindow) {
     })
 
     ipcMain.on('writeError', (event, data) => {
-        errorDump('Write', data.modeState, data.backendError, data.path,)
+        errorDump('Write', data.modeState, data.backendError, data.path)
     })
 
     writeWindow.on('closed', () => {

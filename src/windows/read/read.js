@@ -11,7 +11,12 @@ function createReadWindow (parentWindow) {
         resizable: !productionMode,
         icon: './assets/icons/icon.png',
         parent: parentWindow,
-        modal: true
+        modal: true,
+        webPreferences: {
+            contextIsolation: false,
+            enableRemoteModule: true,
+            nodeIntegration: true
+        }
     })
 
     if (productionMode) {
@@ -28,29 +33,50 @@ function createReadWindow (parentWindow) {
         require('electron').shell.openExternal(url);
     })
 
-    ipcMain.on('openFileSelectDialog', (event, data) => {
-        console.log(data)
-        //todo: toggle between:  single file vid w/ whitelisted exts, or multiple image w/ whitelist exts
-        dialog.showOpenDialog({
-            buttonLabel: 'Select File',
-            defaultPath : require('path').join(require('os').homedir(), 'Desktop'),
-            properties: [
-                'openFile'
-            ]
-        }).then((result) => {
-            if (result.canceled === false) {
-                readWindow.webContents.send('updateReadInput', result.filePaths[0])
-            }
-        })
+    ipcMain.on('readPathDialog', (event, data) => {
+
+        if (data === 'video') {
+
+            dialog.showOpenDialog({
+                buttonLabel: 'Select Video File',
+                defaultPath : require('path').join(require('os').homedir(), 'Desktop'),
+                filters: [
+                    { name: 'Video', extensions: ['avi', 'flv', 'mov', 'mp4', 'wmv'] },
+                ],
+                properties: [
+                    'openFile'
+                ]
+            }).then((result) => {
+                if (result.canceled === false) {
+                    readWindow.webContents.send('updateReadInput', {result: result, type: 'video'})
+                }
+            })
+        } else if (data === 'images') {
+
+            dialog.showOpenDialog({
+                buttonLabel: 'Select Image Files',
+                defaultPath : require('path').join(require('os').homedir(), 'Desktop'),
+                filters: [
+                    { name: 'Images', extensions: ['bmp', 'jpg', 'png'] },
+                ],
+                properties: [
+                    'openFile',
+                    'multiSelections'
+                ]
+            }).then((result) => {
+                if (result.canceled === false) {
+                    readWindow.webContents.send('updateReadInput', {result: result, type: 'images'})
+                }
+            })
+        }
     })
 
     ipcMain.on('readError', (event, data) => {
-        errorDump('Read', data.modeState, data.two, data.three )
+        errorDump('Read', data.modeState, data.backendError, data.path)
     })
 
     readWindow.on('closed', () => {
-        // ipcMain.removeAllListeners('openFileSelectDialog')
-        // ipcMain.removeAllListeners('openDirectorySelectDialog')
+        ipcMain.removeAllListeners('readPathDialog')
         ipcMain.removeAllListeners('readError')
     })
 
