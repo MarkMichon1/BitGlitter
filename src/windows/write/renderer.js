@@ -358,9 +358,7 @@ let blockWidth = 80
 let framesPerSecond = 30
 
 const resultRender = () => {
-    if (currentStep !== 2 || currentStep !==3) {
-        return
-    }
+
     const calibratorBlockOverhead = blockHeight + blockWidth - 1
     const initializerBlockOverhead = 580
     const frameHeaderBitOverhead = 352
@@ -637,7 +635,7 @@ socket.on('write-error', data => {
 })
 
 /*
-    *** Start ***
+    *** Start: ***
 */
 
 // Loading first step, depending on whether the 'run once screen has previously appeared

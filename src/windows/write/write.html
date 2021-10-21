@@ -16,16 +16,18 @@
     <h2 id="step-title"></h2>
     <div class="no-display" id="step-zero">
         <div class="alert alert-primary" role="alert">
-            <h4 class="alert-heading">So we're all on the same page:</h4>
-            <p>This is v1 of an experimental program, developed by one person.  While extensive testing has been
+            <h4 class="alert-heading">Beta Message</h4>
+            <p>This is v0.9 of an experimental program, developed by one person.  While extensive testing has been
                 run on various use cases, some values for some options may break it.  In addition, it is not yet fully
-                optimized when rendering streams over several tens of megabytes when using the default write
+                optimized when rendering streams over several tens of megabytes (MB) when using the default write
                 configuration, resulting in relatively large outputs.  <strong>In this current version for maximum
-                    stability, it is recommended to stick with the default write configuration, using smaller file sizes.</strong>
+                stability, it is recommended to stick with the default write configuration, using smaller file sizes.</strong>
+                  This is if you want the highest chance things will "work."  Otherwise, go crazy and let me know if certain
+                values break things.  :)
             </p>
             <p>Any found issues will be fixed as they are reported, and the app will continue to get refined over time.
                 Thanks for understanding! 👍</p>
-            <p><strong>This is the only time you'll see this.</strong></p>
+            <p><strong>This is the only time you'll see this here.</strong></p>
         </div>
     </div>
     <div class="no-display" id="step-one">
@@ -42,11 +44,11 @@
                         <div class="form-group">
                             <div class="custom-radio">
                                 <input type="radio" name="input-type" id="radio-single-file" value="single-file" required="required">
-                                <label for="radio-single-file">A single file</label>
+                                <label for="radio-single-file">A file</label>
                             </div>
                             <div class="custom-radio">
                                 <input type="radio" name="input-type" id="radio-directory" value="directory" required="required">
-                                <label for="radio-directory">A directory</label>
+                                <label for="radio-directory">A folder</label>
                             </div>
                         </div>
                     </div>
@@ -58,7 +60,7 @@
                         <i class="bi bi-question-circle blue"></i>
                     </span>  Payload Select
                 </th>
-                <td class="text-right">
+                <td>
                     <div>
                         <button class="btn btn-primary" type="button" id="input-path-button" disabled="disabled">Select File/Directory</button>
                     </div>
@@ -244,7 +246,7 @@
                         <span id="encryption-errors" class="text-danger hidden">Can only use valid ASCII characters.</span>
                     </div>
                     <div class="dont-wrap">
-                        <input type="password" class="form-control form-inline" id="encryption-key" placeholder="Your key here">
+                        <input type="password" spellcheck="false" class="form-control form-inline" id="encryption-key" placeholder="Your key here">
                         <span>
                             <i id="password-toggle" class="bi bi-eye-slash"></i>
                             <span id="password-span" class="hidden">

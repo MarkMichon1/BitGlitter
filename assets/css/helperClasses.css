@@ -90,3 +90,7 @@ i#password-toggle:hover {
     margin-bottom: 30px;
     pointer-events: none;
 }
+
+hr {
+    border-top: 3px solid;
+}

@@ -77,6 +77,7 @@ axios.get('http://localhost:7218/config/settings').then((res) => {
     statisticsEnableElement.checked = statisticsEnable
     readStreamNameEnable = response.output_stream_title
     streamNameEnableElement.checked = readStreamNameEnable
+    frameStrikeInputControl()
 })
 
 writeOutputDirPathButtonElement.addEventListener('click', () => {
@@ -100,6 +101,7 @@ ipcRenderer.on('updateReadPath', (event, data) => {
 
 badFrameEnableElement.addEventListener('click', () => {
     strikeEnable = badFrameEnableElement.checked
+    frameStrikeInputControl()
 })
 
 frameStrikeCountElement.addEventListener('input', () => {
@@ -118,3 +120,11 @@ statisticsEnableElement.addEventListener('click', () => {
 streamNameEnableElement.addEventListener('click', () => {
     readStreamNameEnable = streamNameEnableElement.checked
 })
+
+const frameStrikeInputControl = () => {
+    if (strikeEnable) {
+        frameStrikeCountElement.removeAttribute('disabled')
+    } else {
+        frameStrikeCountElement.setAttribute('disabled', 'disabled')
+    }
+}

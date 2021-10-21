@@ -172,7 +172,6 @@ inputPathButtonElement.addEventListener('click', () => {
 })
 
 ipcRenderer.on('updateReadInput', (event, data) => {
-    console.log(data)
     inputPath = data.result.filePaths
     filePathDisplayElement.classList.remove('hidden')
     if (data.type === 'video' || inputPath.length === 1) {
@@ -181,7 +180,6 @@ ipcRenderer.on('updateReadInput', (event, data) => {
         filePathDisplayElement.textContent = `${inputPath.length} images selected`
     }
     nextButtonEnable()
-    console.log(inputPath)
 })
 
 /*
@@ -195,6 +193,10 @@ const autoDeleteElement = document.getElementById('auto-delete-check')
 let stopAtMetadata = true
 let unpackageFiles = true
 let autoDelete = true
+
+stopAtMetadataElement.addEventListener('click', () => stopAtMetadata = stopAtMetadataElement.checked)
+unpackageFilesElement.addEventListener('click', () => unpackageFiles = unpackageFilesElement.checked)
+autoDeleteElement.addEventListener('click', () => autoDelete = autoDeleteElement.checked)
 
 /*
     *** Step 3/4 -- Decryption ***
@@ -213,6 +215,44 @@ let scryptN = 14
 let scryptR = 8
 let scryptP = 1
 
+decryptionKeyInputElement.addEventListener('input', () => {
+    decryptionKey = decryptionKeyInputElement.value
+    if (checkStringASCII(decryptionKey, true)) {
+        nextButtonEnable()
+        stepThreeValid = true
+        decryptionErrorsElement.classList.add('hidden')
+    } else {
+        nextButtonDisable()
+        stepThreeValid = false
+        decryptionErrorsElement.classList.remove('hidden')
+    }
+})
+
+passwordToggleElement.addEventListener('click', () => {
+    if (showPassword) {
+        decryptionKeyInputElement.type = 'password'
+        passwordToggleElement.classList.remove('bi-eye')
+        passwordToggleElement.classList.add('bi-eye-slash')
+    } else {
+        decryptionKeyInputElement.type = 'text'
+        passwordToggleElement.classList.remove('bi-eye-slash')
+        passwordToggleElement.classList.add('bi-eye')
+    }
+    showPassword = !showPassword
+})
+
+scryptNElement.addEventListener('input', () => {
+    scryptN = scryptNElement.value
+})
+
+scryptRElement.addEventListener('input', () => {
+    scryptR = scryptRElement.value
+})
+
+scryptPElement.addEventListener('input', () => {
+    scryptP = scryptPElement.value
+})
+
 /*
     *** Step 4/4 -- Reading ***
 */
@@ -220,26 +260,73 @@ let scryptP = 1
 const readTextInfo = document.getElementById('read-text-info')
 const readProgressBar = document.getElementById('read-progress-bar')
 const streamSHAHolderElement = document.getElementById('stream-sha-holder')
-const streamSHAValueElement = document.getElementById('stream-sha')
+const streamSHAValueElement = document.getElementById('stream-sha-read')
 const successSound = new Audio('../../../assets/mp3/success.mp3')
 const errorSound = new Audio('../../../assets/mp3/error.mp3')
 
-let ReadSavePath = null
+let readSavePath = null
 let successText = null
 let streamSHA256 = null
+let extractedFileCount = 0
 
 const socket = io('ws://localhost:7218')
 
 const readStart = ()=> {
-    axios.post('http://localhost:7218/write/', {
-
+    axios.post('http://localhost:7218/read/', {
+        file_path: 0,
+        stop_at_metadata_load: stopAtMetadata,
+        unpackage_files: unpackageFiles,
+        auto_delete_finished_stream: autoDelete,
+        decryption_key: decryptionKey,
+        scrypt_n: scryptN,
+        scrypt_r: scryptR,
+        scrypt_p: scryptP
     })
 }
 
-//socket receive stream SHA
+socket.on('frame-process', data => {
+    readTextInfo.textContent = `Reading frame ${data[0]}/${data[1]}...`
+    readProgressBar.textContent = `${data[2]} %`
+    readProgressBar.style.width = `${data[2]}%`
+})
 
-//socket receive metadata
-// TODO: add failure signal, copy from write
+socket.on('stream-sha256-receive', data => {
+    streamSHA256 = data
+    streamSHAValueElement.textContent = streamSHA256
+    streamSHAHolderElement.classList.remove('hidden')
+})
+
+socket.on('read-save-path', data => {
+    readSavePath = data
+})
+
+socket.on('read-done', () => {
+    successSound.play()
+    readTextInfo.classList.add('text-success')
+    readTextInfo.textContent = `Read complete! ${extractedFileCount} file(s) were extracted during this operation to
+    ${readSavePath}.  See the Saved Streams window for more information on this stream.`
+    stepFourValid = true
+    nextButtonEnable()
+    nextButtonElement.textContent = 'Finish'
+})
+
+socket.on('read-error', data => {
+    // Signals backend read() failed
+    errorSound.play()
+    readTextInfo.classList.add('text-secondary')
+    readTextInfo.textContent = `Read failure.  An error log has been created in your current read path directory.
+                                Please send this to use in Discord along with any other info, and we will investigate
+                                and fix this ASAP.`
+    stepFourValid = true
+    nextButtonEnable()
+
+    // Read state
+    const modeState = { inputMode, inputPath, stopAtMetadata, unpackageFiles, autoDelete, decryptionKey, scryptN,
+        scryptR, scryptP, readSavePath, streamSHA256 }
+
+    ipcRenderer.send('readError', {modeState: {...modeState}, path: data.read_path, backendError:
+        data.error})
+})
 
 /*
     *** Stream Metadata ***
@@ -262,6 +349,39 @@ const protocolVersionUsedElement = document.getElementById('protocol-version')
 const manifestTitleElement = document.getElementById('manifest-title')
 const manifestAnchorElement = document.getElementById('manifest-anchor')
 const promptSound = new Audio('../../../assets/mp3/prompt.mp3')
+
+socket.on('metadata-receive', data => {
+    // data populate
+    streamSHAMetaElement.textContent = data.stream_sha256
+    streamNameElement.textContent = data.stream_name
+    streamDescriptionElement.textContent = data.stream_description
+    payloadSizeElement.textContent = data.payload_size
+    totalFramesElement.textContent = data.total_frames
+    timeCreatedElement.textContent = data.time_created
+    isCompressedElement.textContent = data.is_compressed
+    isEncryptedElement.textContent = data.is_encrypted
+    isUsingFileMaskElement.textContent = data.file_mask_enabled
+    streamPaletteUsedElement.textContent = data.stream_palette_name
+    blockHeightElement.textContent = data.block_height
+    blockWidthElement.textContent = data.block_width
+    bgVersionUsedElement.textContent = data.bg_version
+    protocolVersionUsedElement.textContent = data.protocol
+
+    fileManifest = data.manifest
+    manifestDecryptSuccess = data.manifest_decrypt_success
+
+    if (manifestDecryptSuccess || !data.file_mask_enabled) {
+        manifestTitleElement.textContent = 'File Manifest:'
+        manifestRender(manifestAnchorElement, fileManifest)
+    } else {
+        manifestTitleElement.textContent = 'Incorrect decryption key, cannot display manifest'
+    }
+
+    // step switch
+    promptSound.play()
+    stepFourSegmentHide()
+    metadataPromptSegmentLoad()
+})
 
 
 /*

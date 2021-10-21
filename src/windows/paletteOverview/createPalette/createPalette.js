@@ -5,8 +5,8 @@ function createCreatePaletteWindow (parentWindow) {
     let createPaletteWindow = new BrowserWindow({
         backgroundColor: '#25282C',
         title: 'Create Palette',
-        width: 585,
-        height: 430,
+        width: 820,
+        height: 700,
         resizable: !productionMode,
         icon: './assets/icons/icon.png',
         parent: parentWindow,

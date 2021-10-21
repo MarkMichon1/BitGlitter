@@ -1,7 +1,7 @@
 const os = require("os");
 
 // Configurable
-const appVersion = '1.0.0'
+const appVersion = '0.9 (Beta)'
 const productionMode = false // turn to true when compiling!
 
 // ** Do not touch **

@@ -9,19 +9,69 @@
     <script src="renderer.js" defer></script>
 </head>
 <body data-set-preferred-mode-onload="true">
-<div class="container">
+<div class="container no-select">
     <h1>Create Palette</h1>
-    <div>
-        <input type="text" class="form-control" placeholder="Palette Name" id="name-input">
-        <p class="hidden" id="name-status"><span id="name-length">0</span>/50</p>
-        <input type="text" class="form-control" placeholder="Palette Description" id="description-input">
-        <p class="hidden" id="description-status"><span id="description-length">0</span>/100</p>
-        <textarea class="form-control mt-20" id="color-set-input" placeholder="Add color set using this format: (0,0,0), (255,255,0), (0,255,255), (255,0,255)"></textarea>
-        <p class="hidden" id="color-set-status">s</p>
-        <div class="mt-20">
-            <button class="btn" id="cancel-button" type="button">Cancel</button>
-            <button class="btn btn-success ml-15 mr-15" id="add-button" disabled="disabled" type="button">Add Palette</button>
-        </div>
+    <p>See the user guide for more information on using this.</p>
+    <table class="table">
+        <tbody>
+        <tr>
+            <th>
+                <span data-toggle="tooltip" data-title="This will be what displays in the app identifying it">
+                    <i class="bi bi-question-circle blue"></i>
+                </span>  Palette Name
+            </th>
+            <td>
+                <div><input type="text" class="form-control" id="palette-name" placeholder="My Palette"></div>
+                <div>
+                    <span id="name-length" class="hidden">0/50</span>  <span id="name-errors" class="text-danger hidden"></span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <span data-toggle="tooltip" data-title="You can add a bit more information about it here">
+                    <i class="bi bi-question-circle blue"></i>
+                </span>  Palette Description (Optional)
+            </th>
+            <td>
+                <textarea class="form-control mt-20" id="palette-description" placeholder="More info about my palette..."></textarea>
+                <div>
+                    <span id="description-length" class="hidden">0/100</span>  <span id="description-errors" class="text-danger hidden"></span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                <span data-toggle="tooltip" data-title="See user guide for detailed info on using this correctly (its easy once you know)">
+                    <i class="bi bi-question-circle blue"></i>
+                </span>  Color Set
+            </th>
+            <td>
+                <textarea class="form-control mt-20" id="palette-color-set" placeholder="Add colors using this format: (0,0,0), (255,255,0), (0,255,255), (255,0,255)"></textarea>
+                <p id="color-set-errors" class="text-danger hidden">--</p>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Number of Colors
+            </th>
+            <td>
+                <span id="number-of-colors">--</span>
+            </td>
+        </tr>
+        <tr>
+            <th>
+                Color Distance Score
+            </th>
+            <td>
+                <span id="color-distance">--</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="mt-20 button-box">
+        <button class="btn" id="cancel-button" type="button">Cancel</button>
+        <button class="btn btn-success ml-15 mr-15" id="add-button" disabled="disabled" type="button">Add Palette</button>
     </div>
 </div>
 </body>

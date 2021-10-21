@@ -35,35 +35,260 @@
     </div>
     <hr>
     <div>
-        <h3>Write</h3>
-        <p>This is a test paragraph to see how it looks.</p>
-    </div>
-    <hr>
-    <div>
-        <h3>Read</h3>
-        <p>This is a test paragraph to see how it looks.</p>
-    </div>
-    <hr>
-    <div>
-        <h3>Palettes</h3>
-        <p>This is a test paragraph to see how it looks.</p>
-        <p>Default palettes are hardwired into BitGlitter, and offer optimal performance and speed</p>
-    </div>
-    <hr>
-    <div>
-        <h3>Settings</h3>
-        <p>This is a test paragraph to see how it looks.</p>
-    </div>
-    <div>
-        <h3>Statistics</h3>
+        <h3><strong>Write: Turning files into BitGlitter streams</strong></h3>
+        <div class="alert alert-secondary" role="alert">
+            <h4 class="alert-heading">(v0.9) File size, write configs, and stability</h4>
+            <p>
+                Its currently recommended sticking with the default config settings for write and not send payloads
+                larger than several tens of megabytes (MB).  Codecs used in video rendering still need to be optimized,
+                and files created can be quite large.
+            </p>
+            <p>
+                As for the other rendering values (palette, frame geometry, FPS, etc), if you're looking for maximum
+                stability, stick with the default values.  These have been ran and tested the most.  Some combination
+                of changed values may break the app, and if you're looking to do just that for testing/moving the app to
+                a stable v1.0, that would be nice.
+            </p>
+        </div>
+        <h5><strong>Step 1/5: File/Folder Select</strong></h5>
         <p>
-            This is nothing but some interesting statistics to view your usage with BitGlitter.  They get updated at the
-            end of each read or write cycle.  Pressing <strong>Clear</strong> resets all values back to zero.
+            BitGlitter lets you choose between sending a single file or a folder.  Simply choose which one, and then
+            select it with the button directly below.
+        </p>
+        <h5><strong>Step 2/5: Stream Configuration</strong></h5>
+        <p>
+            <strong>Render Mode</strong> is what lets you toggle between outputting a single MP4 BitGlitter stream
+            (recommended) or a bunch of images.  This gives you more choices as to where you can host your files.  Images
+            are more or less the same as the frames used in the videos, but with some added necessary headers.  If you
+            can, its easier to use videos, being its just one file.
+        </p>
+        <p>
+            Enabling <strong>Compression</strong> packages and shrinks your payload prior to rendering it in frames,
+            resulting in less frames needing to be rendered, and being overall more efficient.  It is strongly recommended
+            to not change this.
+        </p>
+        <p>
+            <strong>Stream Name</strong> is the name given to it, and will be seen by others reading the stream.  You
+            can look at it like the name of a torrent.  You can use up to 150 ASCII characters.  This is required.  Aside
+            from supplying the file(s) to write and the title, this is all you technically need to do.  Everything else
+            has default values, so you can use this app starting out without needing to know exactly how everything works.
+        </p>
+        <p>
+            <strong>Stream Description</strong> is an optional field if you want to add more information about the stream.
+            You can use all ASCII characters, and there is no length limit.
+        </p>
+        <h5><strong>Step 3/5: Render Configuration</strong></h5>
+        <p>
+            This is the main window where you control how the frames will render.
+        </p>
+        <p>
+            <strong>Palette Selection</strong> is where you choose which palette you'll have in your stream.  You can
+            get much more information about the palettes using the Palette window accessible on the main screen.
+            The default palette used is a great middle ground choice for both performance and file
+            integrity.  We'll explain this much more in detail below.
+        </p>
+        <p>
+            <strong>Pixel Width</strong> is how many pixels across each block (square displayed) will be.  Larger blocks
+            will be easier to read, but less efficient for data transmission.  Smaller blocks are the exact opposite,
+            harder to read but more efficient.  In lossless applications you can make them very small (as small as one
+            pixel across), giving extreme increases in efficiency (data per frame).  It all comes down what your use case
+            is.
+        </p>
+        <p>
+            <strong>Block Height</strong> and <strong>Block Width</strong> are the dimensions in which the frame will be
+            constructed.
+        </p>
+        <p>
+            <strong>Frames Per Second</strong> is (no surprise) how many frames will be in a given second of video.
+            Generally, the more the better, but be mindful of what is supported on platforms if you intend to host it
+            somewhere.
+        </p>
+        <h5><strong>Step 4/5: Encryption Configuration</strong></h5>
+        <p>
+            Optionally, you can choose to encrypt your stream, giving only people with your key access to the files.
+        </p>
+        <p>
+            <strong>Encryption Key</strong> is where you'll type the password in.  Long, random strings of characters
+            are strong passwords.
+        </p>
+        <p>
+            <strong>File Masking</strong> will, if encrypting the stream, hide the stream manifest (displaying its contents,
+            files, folders, file sizes, etc).  It will only be visible (as well as the data able to be extracted) once
+            the correct key is supplied.
+        </p>
+        <p>
+            (Advanced) <strong>Scrypt N, R, and P</strong> are parameters used when hashing your password.  Basically,
+            you can control how costly it is for a computer to brute-force your password.  This is not at all something
+            you need to touch if you don't know what it is (or don't care); the values are set to strong defaults, and
+            this only exists so those more familiar with cryptography can fine tune how strong they want it to be.
+            <a href="https://blog.filippo.io/the-scrypt-parameters/" target="_blank">This page</a> does a great job
+            explaining this more in detail.
+        </p>
+        <p>
+            All values must be positive integers.  Parameter <code class="code">N</code> takes a value as 2**N (must be
+            a power of 2 in other words), <code class="code">R</code> and <code class="code">P</code> accept values as-is.
+            <strong>IMPORTANT:</strong> if using non-default values for this, the person(s) reading the stream must know
+            what they are to input them during the read process.  If this isn't done, the stream cannot be decrypted,
+            even with the right password!
+        </p>
+        <h5><strong>Step 5/5: Rendering</strong></h5>
+        <p>
+            This is where the magic happens.  After packaging your file(s) they are rendered into a video or images.
+            Cancelling will abort the render.  When complete, the <code class="code">SHA-256</code> hash of the stream
+            will display.  This is the unique fingerprint of the file(s) encoded in the stream, and serves as an ID
+            for the stream itself.  This can be used by readers to verify the stream is what they think it is.
+        </p>
+        <h5><strong>Potential Errors</strong></h5>
+        <p>
+            Things may break, and if so, the app will let you know with a display message.  An text file with the 'state'
+            of the app will be written in your write path, where your rendered files will output (configurable in the
+            settings window, more on that below).  It would help a lot to send this to us on Discord, or to create an "issues"
+            on Github so we can look into it and fix it.
         </p>
     </div>
     <hr>
     <div>
-        <h3>In closing...</h3>
+        <h3><strong>Read: Turning BitGlitter streams back into files</strong></h3>
+        <h5><strong>Step 1/4: Encoded File Select</strong></h5>
+        <p>asd</p>
+        <h5><strong>Step 2/4: Read Configuration</strong></h5>
+        <p>asd</p>
+        <h5><strong>Step 3/4: Decryption</strong></h5>
+        <p>asd</p>
+        <h5><strong>Step 4/4: Reading</strong></h5>
+        <p>asd</p>
+        <h5><strong>Metadata Prompt</strong></h5>
+        <p>asd</p>
+    </div>
+    <hr>
+    <div>
+        <h3><strong>Saved Reads</strong></h3>
+        <p>tba</p>
+        <h5>TBA</h5>
+    </div>
+    <hr>
+    <div>
+        <h3><strong>Palettes</strong></h3>
+        <p>
+            This is in reference to the palette window, accessible in the main menu.
+        </p>
+        <p>
+            Palettes are the color sets used in frames to send data.  There is a nice range of palettes included with the
+            app; some are purely functional to maximize file integrity or performance, others are purely aesthetic.  You
+            can also create your very own color sets to use in your BitGlitter streams, with whatever colors you want!
+            But more on that in a moment.
+        </p>
+        <h5><strong>Default Palettes</strong></h5>
+        <p>
+            These are included palettes that are optimized for performance, file integrity, or a combination of both.
+            There was not much thought put into their aesthetics, but rather doing a good job at what they are intended
+            to do.  It is recommended to stick with these until you understand what makes a palette "good" for data transmission,
+            and yes, we will teach you.  Default palettes will always have the word "default" in their name, and will
+            be permanently locked in the app (cannot be deleted).
+        </p>
+        <h5><strong>More About Palettes</strong></h5>
+        <p>
+            If you click a palette in the selection window on the left side of the palette screen, the display on the right
+            will tell you a variety of different attributes about it.  We'll go over those here.
+        </p>
+        <p>
+            <strong>Bit Length</strong> is how many bits of binary data (the building block for all files/data on computers)
+            fit into each "block," or colorful square.  There are 8 bits in a byte.  The higher it is, the more compact
+            a stream will be, fitting into less blocks and frames overall.  You generally want to have this as high as you
+            can, with the medium that will host the rendered file in mind.
+        </p>
+        <p>
+            <strong>Color Distance Score</strong> is the "distance" between colors in the set from each other.  Think of
+            it as a margin of error if there is any corruption or distortion to the images; the closer the colors are in terms
+            of value (say the color red and a very slightly different color of red), the less it will take to corrupt
+            the frame.  The greater the difference between colors (like black and white), the harder it is for one to be
+            mistaken for the other when reading.  This is calculated by viewing the RGB channels for each color as XYZ
+            coordinates in 3D space, and finding the shortest distance that exists between the colors.
+        </p>
+        <p>
+            So as you can see, you want to maximize both bit length AND color distance.  But its impossible to have both;
+            they are like different extremes on a sliding scale.  Each end has its own benefit.  This is exactly why there
+            is a default palette (6 Bit Default) that gives you a great compromise between the two; holding a good amount
+            of data, while at the same time resistant for most use cases.
+        </p>
+        <p>
+            <strong>Color Set</strong> is simply the RGB set of colors that make up the palette.
+        </p>
+        <p>
+            <strong>Palette ID</strong> is the internal ID used within BitGlitter to identify and work with the palette.
+            This is more for development purposes, you don't need to worry about this.
+        </p>
+        <p>
+            <strong>Palette Share Code</strong> is a code you can share with others so too can render using custom palettes
+            saved on BitGlitter.  Please note- when someone reads a stream using a custom palette, they automatically
+            "learn" the palette.  So this is for if you want to share the palette without someone needing to read a stream
+            using it.  Use this code with the "import palette" button on the top left of the palette window.
+        </p>
+        <p>
+            <strong>Created On</strong> is the time this palette was created.  The time dynamically adjusts to your time zone.
+        </p>
+        <p>
+            <strong>Included with BitGlitter</strong> is if this particular palette came shipped with the app.  BitGlitter
+            includes both some default palettes to use and a few dozen custom ones designed by various artists to play around
+            with, and see what's possible with the app.
+        </p>
+        <h5><strong>Using Custom Palettes</strong></h5>
+        <p>
+            Custom palettes are any non-official color sets able to be used in streams.  As said directly above, the app
+            comes with a few.  Aside from them being "custom," they perform exactly as a normal palette would when reading
+            and writing.
+        </p>
+        <p><strong>Importing Palettes</strong></p>
+        <p>
+            If you have a share code given to you by someone else, all you have to do is click the blue import button on the top
+            left of the palette window, and paste the code in there.  Clicking import will add it to your list of available
+            palettes to use.
+        </p>
+        <p><strong>Creating Palettes</strong></p>
+        <p>tba</p>
+    </div>
+    <hr>
+    <div>
+        <h3><strong>Settings</strong></h3>
+        <p>There is a handful of settings you configure BitGlitter with:</p>
+        <p><strong>Write Path</strong> is where your rendered files will save to.</p>
+        <p><strong>Read Path</strong> is where your files extracted from BitGlitter streams will save to.</p>
+        <p>
+            <strong>Bad Frame Strikes</strong> is something used during reading to 'break you out' of severely corrupted
+            streams.  Reading and decoding each frame is a relatively CPU expensive task, and when done over thousands or
+            tens of thousands of frames, takes a considerable amount of time.  This functionality will abort a read if
+            1) its enabled, and 2) if the count of bad frames exceeds a certain amount.  This feature exists to save you
+            time in case the majority of frames are severely corrupted, and you don't want to go through the stream.
+            Disabling it will have the app go through every frame, regardless of how many past frames were corrupt and
+            unreadable.
+        </p>
+        <p>
+            <strong>Maximum CPU Cores</strong> lets you set how much of your CPU you wish to dedicate to writing and reading
+            streams.  The work is pretty CPU intensive, and BitGlitter leverages as many CPU cores as possible to speed
+            up the work.  This can disrupt other tasks on your machine as its running; this lets you control that.
+        </p>
+        <p>
+            <strong>Enable Statistics</strong> toggles whether read and write data is added to the statistics window (explained
+            in the next section below this).  Disabling it will clear all existing statistics.
+        </p>
+        <p>
+            <strong>Output Stream Name in Write</strong> means the rendered files during write will have the stream name
+            as the file.  If disabled, the <code class="code">SHA-256</code> hash of the stream will be used as the
+            filename instead.
+        </p>
+    </div>
+    <hr>
+    <div>
+        <h3><strong>Statistics</strong></h3>
+        <p>
+            This is nothing but some interesting statistics to view your usage with BitGlitter.  They get updated at the
+            end of each read or write cycle.  Pressing <strong>Clear</strong> resets all values back to zero.  You can
+            toggle this functionality in the settings window.
+        </p>
+    </div>
+    <hr>
+    <div>
+        <h3><strong>In closing...</strong></h3>
         <p>
             I hope the guide gave you a better understanding of BitGlitter and how it works.  It was a lot of work
             putting this all together, but its a great feeling to finally release this to the world.
