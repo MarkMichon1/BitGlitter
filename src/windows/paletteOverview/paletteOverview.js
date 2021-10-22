@@ -34,6 +34,8 @@ function createPaletteOverviewWindow (parentWindow) {
     paletteOverviewWindow.loadFile(`${__dirname}/paletteOverview.html`)
 
     // Events
+
+    // This handles importing and adding palettes, as they function identically at this point.
     ipcMain.on('importPalette', (event, options) => {
         paletteOverviewWindow.webContents.send('createdPalette', options)
     })

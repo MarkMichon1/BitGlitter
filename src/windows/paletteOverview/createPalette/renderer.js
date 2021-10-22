@@ -17,8 +17,13 @@ const colorDistanceElement = document.getElementById('color-distance')
 const cancelButton = document.getElementById('cancel-button')
 const addButton = document.getElementById('add-button')
 
+const closeWindow = () => {
+    const currentWindow = remote.getCurrentWindow()
+    currentWindow.close()
+}
+
 let nameValid = false
-let descriptionValid = false
+let descriptionValid = true
 let colorSetValid = false
 
 let paletteName = null
@@ -26,14 +31,17 @@ let paletteDescription = null
 let colorSetString = null // dirty non-parsed
 let colorSet = null
 
-//Can only use a-z, A-Z, 0-9, and -_.
-
 const isEverythingValid = () => {
     if (nameValid && descriptionValid && colorSetValid) {
         addButton.removeAttribute('disabled')
     } else {
         addButton.setAttribute('disabled', 'disabled')
     }
+}
+
+const resetPaletteData = () => {
+    numberOfColorsElement.textContent = '--'
+    colorDistanceElement.textContent = '--'
 }
 
 paletteNameElement.addEventListener('input', () => {
@@ -75,7 +83,7 @@ paletteNameElement.addEventListener('input', () => {
             isEverythingValid()
         })
     }
-
+    isEverythingValid()
 })
 
 paletteDescriptionElement.addEventListener('input', () => {
@@ -120,23 +128,59 @@ paletteDescriptionElement.addEventListener('input', () => {
 colorSetElement.addEventListener('input', () => {
     colorSetString = colorSetElement.value
     if (colorSetString.length === 0) {
-
+        colorSetErrors.classList.add('hidden')
         colorSetValid = false
+        resetPaletteData()
         isEverythingValid()
     } else {
-        parseResults = parseArray()
+        parseResults = parseArray(colorSetString)
         if (parseResults.results === false) {
+            resetPaletteData()
             colorSetValid = false
+            colorSetErrors.textContent = 'Not a valid set of colors.  Please follow the correct format.'
+            colorSetErrors.classList.remove('hidden')
         } else {
+            colorSet = parseResults.returnedArray
             axios.post('http://localhost:7218/palettes/validate/color-set', {color_set: colorSet})
                 .then(response => {
-                    console.log(response.data)
+                    if (response.data.error) {
+                        resetPaletteData()
+                        colorSetValid = false
+                        colorSetErrors.classList.remove('hidden')
+                        if (response.data.error === '2^n') {
+                            colorSetErrors.textContent = 'Number of colors must be a power of 2 (2, 4, 8, 16, etc), ' +
+                                'with a minimum of 2 colors'
+                        } else if (response.data.error === 'max_length') {
+                            colorSetErrors.textContent = 'Custom palette cannot exceed 256 colors'
+                        } else if (response.data.error === 'channels') {
+                            colorSetErrors.textContent = 'Each color needs 3 channels, for red green and blue'
+                        } else if (response.data.error === 'range') {
+                            colorSetErrors.textContent = 'For each RGB value, it must be an integer between 0 and 255'
+                        } else if (response.data.error === 'distance') {
+                            colorSetErrors.textContent = 'Cannot have two identical colors in a color set'
+                        }
+                    } else {
+                        colorSetValid = true
+                        colorSetErrors.classList.add('hidden')
+                        numberOfColorsElement.textContent = colorSet.length
+                        colorDistanceElement.textContent = response.data.color_distance
+                    }
                     isEverythingValid()
             })
         }
     }
 
 })
+
+addButton.addEventListener('click', () => {
+    axios.post('http://localhost:7218/palettes/add', {name: paletteName, description: paletteDescription,
+        color_set: colorSet}).then(response => {
+        ipcRenderer.send('importPalette', response.data)
+        closeWindow()
+    })
+})
+
+cancelButton.addEventListener('click', () => closeWindow())
 
 /*
 Returned validation values:
@@ -149,7 +193,7 @@ Description
     max_length: Palette description cannot exceed 100 characters
     ascii: Palette name can only use standard ASCII characters (a-z, A-Z, 0-9, normal punctuation and symbols)
 Color Set
-    max_length: Custom paletteOverview cannot exceed 256 colors
+    max_length: Custom palette cannot exceed 256 colors
     2^n: Number of colors must be a power of 2 (2, 4, 8, 16, etc), with a minimum of 2 colors
     channels: Each color needs 3 channels, for red green and blue
     range: For each RGB value, it must be an integer between 0 and 255

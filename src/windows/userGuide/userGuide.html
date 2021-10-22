@@ -150,20 +150,54 @@
     <div>
         <h3><strong>Read: Turning BitGlitter streams back into files</strong></h3>
         <h5><strong>Step 1/4: Encoded File Select</strong></h5>
-        <p>asd</p>
+        <p>
+            Start by selecting your video or image files you'd like to decode.
+        </p>
         <h5><strong>Step 2/4: Read Configuration</strong></h5>
-        <p>asd</p>
+        <p>These options give you a bit more control over security, and behavior of the app.</p>
+        <p>
+            <strong>Stop at Metadata Load</strong> pauses the read operation once it reaches and decodes the metadata
+            header.  A prompt will appear on the screen, displaying all of the data it has collected from the stream.
+            Enable this if you're not completely sure you trust the sender or wish to verify its contents before
+            continuing.  If you cancel, the stream's SHA-256 (its ID) will be placed on a 'blacklist' and future frames
+            from it will be ignored.  These blacklisted streams can always be removed in the "Saved Streams" window.
+        </p>
+        <p>
+            <strong>Unpackage Files</strong> controls whether you want to unpackage all available files at the end of
+            the read cycle.  BitGlitter will extract as many files from a stream as possible if there are any corrupted
+            frames.  Disabling this will prevent this entirely.  You can unpackage them later in the "Saved Streams"
+            window.
+        </p>
+        <p>
+            <strong>Auto-Delete Finished Stream Data</strong> will remove all stream data and database files once the
+            stream is 100% complete.  It usually makes sense to keep this enabled.  If disabled, while the temporary data
+            from the frames will be removed, the metadata and state data about the read itself will remain.
+        </p>
         <h5><strong>Step 3/4: Decryption</strong></h5>
-        <p>asd</p>
+        <p>
+            If you know the stream is encrypted, this is where you can enter the decryption key and other values.  If
+            the stream is encrypted when you didn't think it was, or you got any of the values wrong- don't worry, you
+            can change them in the "Saved Streams" window and try again.
+        </p>
+        <p>
+            <strong>Scrypt N, R, and P</strong> shouldn't be touched unless you know that the sender has changed the
+            default values.  Be advised- if you change these values when the stream used the default ones, the decryption
+            key will not work!
+        </p>
         <h5><strong>Step 4/4: Reading</strong></h5>
-        <p>asd</p>
+        <p>This is where the magic happens, and your files get extracted from the stream.</p>
         <h5><strong>Metadata Prompt</strong></h5>
-        <p>asd</p>
+        <p>
+            If you have "Stop at Metadata Load" enabled in Step 2, this prompt may come up.  Choose to either continue
+            decoding the stream if everything looks good to you, or cancel it.
+        </p>
     </div>
     <hr>
     <div>
         <h3><strong>Saved Reads</strong></h3>
-        <p>tba</p>
+        <p>
+            This is where you can view and interact with your saved reads, as well as important information about them.
+        </p>
         <h5>TBA</h5>
     </div>
     <hr>
@@ -245,7 +279,43 @@
             palettes to use.
         </p>
         <p><strong>Creating Palettes</strong></p>
-        <p>tba</p>
+        <p>
+            Creating your own custom palettes is an easy, straight-forward process.
+        </p>
+        <p>
+            <strong>Palette Name</strong> is the main identifier for the palette, and what will be displayed on the app.
+            There is a maximum limit of 50 characters.
+        </p>
+        <p>
+            <strong>Palette Description</strong> is an optional field you can use to add a bit more extra information
+            about it if you'd like.  There is a maximum limit of 100 characters.
+        </p>
+        <p>
+            <strong>Color Set</strong> is the list of colors in RGB format that will make up the palette.  There's a few
+            guidelines to follow when adding colors:
+            <ul>
+                <li>
+                    Must follow this format with brackets, commas, and spaces:  <code class="code">(0,0,0),
+                    (100,100,100)</code>.
+                </li>
+                <li>
+                    Must have 3 channels (red, green, blue) for each color, and all be integers between 0 and 255.
+                </li>
+                <li>
+                    Cannot have two identical colors in the same color set.
+                </li>
+                <li>
+                    The amount of total colors must be a power of 2 (2, 4, 8, 16, 32, etc).
+                </li>
+                <li>
+                    Cannot have more than 256 colors in a palette.
+                </li>
+            </ul>
+        </p>
+        <p>
+            To maximize durability against file corruption, its recommended making your colors as varied as possible.
+            The color distance score updates each time you update the text box for it.
+        </p>
     </div>
     <hr>
     <div>
