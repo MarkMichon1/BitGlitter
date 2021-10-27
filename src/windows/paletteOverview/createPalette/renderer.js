@@ -1,6 +1,7 @@
 const axios = require('axios')
 const { ipcRenderer, remote } = require('electron')
 
+const { backendLocation } = require('../../../../config')
 const { parseArray } = require('../../../utilities/parseArray')
 
 const paletteNameElement = document.getElementById('palette-name')
@@ -64,7 +65,7 @@ paletteNameElement.addEventListener('input', () => {
         nameLengthElement.textContent = `${paletteName.length}/50`
     }
     if (paletteName) {
-        axios.post('http://localhost:7218/palettes/validate/name', {name: paletteName}).then(response => {
+        axios.post(`${backendLocation}/palettes/validate/name`, {name: paletteName}).then(response => {
             if (response.data) {
                 nameValid = false
                 nameErrorsElement.classList.remove('hidden')
@@ -105,7 +106,7 @@ paletteDescriptionElement.addEventListener('input', () => {
         descriptionLengthElement.textContent = `${paletteDescription.length}/100`
     }
     if (paletteDescription) {
-        axios.post('http://localhost:7218/palettes/validate/description', {description: paletteDescription})
+        axios.post(`${backendLocation}/palettes/validate/description`, {description: paletteDescription})
             .then(response => {
                 if (response.data) {
                     descriptionValid = false
@@ -141,7 +142,7 @@ colorSetElement.addEventListener('input', () => {
             colorSetErrors.classList.remove('hidden')
         } else {
             colorSet = parseResults.returnedArray
-            axios.post('http://localhost:7218/palettes/validate/color-set', {color_set: colorSet})
+            axios.post(`${backendLocation}/palettes/validate/color-set`, {color_set: colorSet})
                 .then(response => {
                     if (response.data.error) {
                         resetPaletteData()
@@ -173,7 +174,7 @@ colorSetElement.addEventListener('input', () => {
 })
 
 addButton.addEventListener('click', () => {
-    axios.post('http://localhost:7218/palettes/add', {name: paletteName, description: paletteDescription,
+    axios.post(`${backendLocation}/palettes/add`, {name: paletteName, description: paletteDescription,
         color_set: colorSet}).then(response => {
         ipcRenderer.send('importPalette', response.data)
         closeWindow()

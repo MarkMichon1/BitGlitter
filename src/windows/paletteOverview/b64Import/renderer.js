@@ -1,6 +1,8 @@
 const axios = require('axios')
 const { ipcRenderer, remote } = require('electron')
 
+const { backendLocation } = require('../../../../config')
+
 const textInput = document.getElementById('input-box')
 const importButton = document.getElementById('import-button')
 const statusText = document.getElementById('status-text')
@@ -20,7 +22,7 @@ textInput.addEventListener('input', () => {
         importButton.setAttribute('disabled', 'disabled')
         statusText.textContent = ''
     } else {
-        axios.post('http://localhost:7218/palettes/base64/validate', {'b64_string': inputValue}).then((response) =>
+        axios.post(`${backendLocation}/palettes/base64/validate`, {'b64_string': inputValue}).then((response) =>
             {
                 message = response.data
                 if ('error' in message) {
@@ -51,7 +53,7 @@ textInput.addEventListener('input', () => {
 
 importButton.addEventListener('click', () => {
     if (validString) {
-        axios.post('http://localhost:7218/palettes/base64/import', {'b64_string': textInput.value}).then((response) =>
+        axios.post(`${backendLocation}/palettes/base64/import`, {'b64_string': textInput.value}).then((response) =>
             {
                 ipcRenderer.send('importPalette', response.data)
                 textInput.value = ''

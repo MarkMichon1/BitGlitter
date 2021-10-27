@@ -1,5 +1,6 @@
 const axios = require('axios')
 const { remote } = require('electron')
+const { backendLocation } = require('../../../config')
 const { humanizeFileSize } = require('../../utilities/display')
 
 const clearButton = document.getElementById('clear-button')
@@ -12,7 +13,7 @@ let framesWrote = document.getElementById('frames-wrote')
 let data = null
 let hasCleared = false
 
-axios.get('http://localhost:7218/config/statistics').then((response) => {
+axios.get(`${backendLocation}/config/statistics`).then((response) => {
     data = response.data
     blocksRead.textContent = data.blocks_read.toLocaleString()
     blocksWrote.textContent = data.blocks_wrote.toLocaleString()
@@ -27,7 +28,7 @@ axios.get('http://localhost:7218/config/statistics').then((response) => {
 
 clearButton.addEventListener("click", function (e) {
     if (data.blocks_read > 0 || data.blocks_wrote > 0 && !hasCleared) {
-        axios.get('http://localhost:7218/config/statistics/reset').then(() => {
+        axios.get(`${backendLocation}/config/statistics/reset`).then(() => {
             blocksRead.textContent = '0'
             blocksWrote.textContent = '0'
             dataRead.textContent = '0 B'

@@ -1,8 +1,9 @@
 const axios = require('axios')
+const bodyParser = require('body-parser')
+const express = require('express')
 const { ipcRenderer, remote } = require('electron')
-const io = require("socket.io-client");
 
-const { appVersion } = require('../../../config')
+const { appVersion, backendLocation, expressPort } = require('../../../config')
 const { abridgedPath, bitorBits, bitsToBytes, checkStringASCII, frameorFrames,
     humanizeFileSize } = require("../../utilities/display");
 const { sortPaletteList } = require('../../utilities/palette')
@@ -133,7 +134,7 @@ const backButtonHandler = () => {
 const nextButtonHandler = () => {
     if (currentStep === 0) {
         if (!stepZeroConfirmed) {
-            axios.post('http://localhost:7218/write/show-once').then(() => {
+            axios.post(`${backendLocation}/write/show-once`).then(() => {
                 stepZeroConfirmed = true
             })
         }
@@ -219,7 +220,7 @@ ipcRenderer.on('updateWriteInput', (event, data) => {
     spinnerElement.classList.remove('hidden')
     inputPathDisplayElement.classList.remove('hidden')
     inputPathButtonElement.setAttribute('disabled', 'disabled')
-    axios.post('http://localhost:7218/write/initial-write-data', {path: data}).then((response) => {
+    axios.post(`${backendLocation}/write/initial-write-data`, {path: data}).then((response) => {
         sizeInBytes = response.data.total_size
         resultRender()
         spinnerElement.classList.add('hidden')
@@ -381,7 +382,7 @@ const resultRender = () => {
     const netDataPerFrame = bitsToBytes((blocksLeft * streamPaletteBitLength) - frameHeaderBitOverhead)
     const payloadAllocation = (netDataPerFrame / rawDataPerFrame) * 100
 
-    axios.post('http://localhost:7218/write/frame-estimator', {block_height: blockHeight, block_width:
+    axios.post(`${backendLocation}/write/frame-estimator`, {block_height: blockHeight, block_width:
         blockWidth, size_in_bytes: sizeInBytes, bit_length: streamPaletteBitLength, output_mode: writeMode})
         .then((response) => {
         framesNeededDisplayElement.textContent = `${response.data.total_frames.toLocaleString()} ${frameorFrames(response.data.total_frames)}`
@@ -440,7 +441,7 @@ const generatePaletteLi = (palette) => {
 }
 
 const getPaletteList = () => {
-    axios.get('http://localhost:7218/palettes').then((response) => {
+    axios.get(`${backendLocation}/palettes`).then((response) => {
         paletteList = response.data
         sortPaletteList()
         paletteList.forEach(palette => {
@@ -542,12 +543,111 @@ const errorSound = new Audio('../../../assets/mp3/error.mp3')
 
 let writeSavePath = null
 let successText = null
+let totalFrames = null
 let streamSHA256 = null
 
-const socket = io('ws://localhost:7218')
+/*
+    Express Setup
+*/
+const expressApp = express()
+expressApp.use(bodyParser.json())
+
+expressApp.post('/write/test', (req, res) => {
+    console.log(`Test message from backend received: ${req.body.success}`)
+    res.send(true)
+})
+
+expressApp.post('/write/write-preprocess', (req, res) => {
+    // Displays some preprocess data prior to rendering
+    renderTextInfo.textContent = req.body.text
+    res.send(true)
+})
+
+expressApp.post('/write/frame-count', (req, res) => {
+    totalFrames = req.body.total_frames
+    res.send(true)
+})
+
+expressApp.post('/write/write-render', (req, res) => {
+    // Displays frame render progress and manipulates progress bar
+    let frameNumber = req.body.frame_number
+    let percentage = req.body.percentage
+
+    renderTextInfo.textContent = `Generating frame ${frameNumber}/${totalFrames}...`
+    renderProgressBar.textContent = `${percentage} %`
+    renderProgressBar.style.width = `${percentage}%`
+    res.send(true)
+})
+
+expressApp.post('/write/write-video-render', (req, res) => {
+    // Displays VIDEO render progress and manipulates progress bar
+    let frameNumber = req.body.frame_number
+    let percentage = req.body.percentage
+
+    renderTextInfo.textContent = `Rendering video frame ${frameNumber}/${totalFrames}...`
+    renderProgressBar.textContent = `${percentage} %`
+    renderProgressBar.style.width = `${percentage}%`
+    res.send(true)
+})
+
+expressApp.post('/write/stream-sha', (req, res) => {
+    streamSHA256 = req.body.sha256
+    res.send(true)
+})
+
+expressApp.post('/write/save-path', (req, res) => {
+    writeSavePath = req.body.save_path
+    res.send(true)
+})
+
+expressApp.post('/write/done', (req, res) => {
+    // Signals write is complete
+    successSound.play()
+    if (writeMode === 'video') {
+        successText = 'video is'
+    } else {
+        successText = 'frames are'
+    }
+    renderTextInfo.classList.add('text-success')
+    renderTextInfo.textContent = `Write Complete!  Your ${successText} available here: ${writeSavePath}`
+    stepFiveValid = true
+    streamSHAValueElement.textContent = streamSHA256
+    streamSHAHolderElement.classList.remove('hidden')
+    nextButtonEnable()
+    nextButtonElement.textContent = 'Finish'
+    res.send(true)
+})
+
+expressApp.post('/write/error', (req, res) => {
+    // Signals backend write() failed
+    errorSound.play()
+    renderTextInfo.classList.add('text-secondary')
+    renderTextInfo.textContent = `Write failure- this can be caused by write parameters, or something else.  An error
+    log has been created in your current write path directory.  Please send this to us in Discord along with any other 
+     info, and we will investigate and fix this ASAP.`
+    stepFiveValid = true
+    nextButtonEnable()
+    nextButtonElement.textContent = 'Finish'
+
+    // Write state
+    const modeState = {stepZeroConfirmed, inputType, inputPath, sizeInBytes, writeMode, compressedEnabled: compressionEnabled, streamName,
+        streamDescription, nameLengthValid, nameValid, descriptionValid, streamPaletteID, streamPaletteBitLength,
+        pixelWidth, blockHeight, blockWidth, framesPerSecond, cryptoKey, fileMaskEnabled, scryptN, scryptR, scryptP,
+        writeSavePath}
+
+    ipcRenderer.send('writeError', {modeState: {...modeState}, path: req.body.write_path, backendError:
+        req.body.traceback})
+    res.send(true)
+})
+
+expressApp.listen(expressPort, () => {
+    console.log('ExpressJS write running')
+})
+
+//  *********************
 
 const writeStart = () => {
-    axios.post('http://localhost:7218/write/', {
+    axios.post(`${backendLocation}/write/`, {
         input_path: inputPath,
         stream_name: streamName,
         stream_description: streamDescription,
@@ -567,79 +667,12 @@ const writeStart = () => {
     })
 }
 
-socket.on('write-preprocess', data => {
-    // Displays some preprocess data prior to rendering
-    renderTextInfo.textContent = data
-})
-
-socket.on('write-render', data => {
-    // Displays frame render progress and manipulates progress bar
-    renderTextInfo.textContent = `Generating frame ${data[0]}/${data[1]}...`
-    renderProgressBar.textContent = `${data[2]} %`
-    renderProgressBar.style.width = `${data[2]}%`
-})
-
-socket.on('write-video-render', data => {
-    // Displays VIDEO render progress and manipulates progress bar
-    renderTextInfo.textContent = `Rendering video frame ${data[0]}/${data[1]}...`
-    renderProgressBar.textContent = `${data[2]} %`
-    renderProgressBar.style.width = `${data[2]}%`
-})
-
-socket.on('stream-sha', data => {
-    // Displays some preprocess data prior to rendering
-    streamSHA256 = data
-})
-
-socket.on('write-save-path', data => {
-    writeSavePath = data
-
-})
-
-socket.on('write-done', () => {
-    // Signals write is complete
-    successSound.play()
-    if (writeMode === 'video') {
-        successText = 'video is'
-    } else {
-        successText = 'frames are'
-    }
-    renderTextInfo.classList.add('text-success')
-    renderTextInfo.textContent = `Write Complete!  Your ${successText} available here: ${writeSavePath}`
-    stepFiveValid = true
-    streamSHAValueElement.textContent = streamSHA256
-    streamSHAHolderElement.classList.remove('hidden')
-    nextButtonEnable()
-    nextButtonElement.textContent = 'Finish'
-})
-
-socket.on('write-error', data => {
-    // Signals backend write() failed
-    errorSound.play()
-    renderTextInfo.classList.add('text-secondary')
-    renderTextInfo.textContent = `Write failure- this can be caused by write parameters, or something else.  An error
-    log has been created in your current write path directory.  Please send this to us in Discord along with any other 
-     info, and we will investigate and fix this ASAP.`
-    stepFiveValid = true
-    nextButtonEnable()
-    nextButtonElement.textContent = 'Finish'
-
-    // Write state
-    const modeState = {stepZeroConfirmed, inputType, inputPath, sizeInBytes, writeMode, compressedEnabled: compressionEnabled, streamName,
-    streamDescription, nameLengthValid, nameValid, descriptionValid, streamPaletteID, streamPaletteBitLength,
-    pixelWidth, blockHeight, blockWidth, framesPerSecond, cryptoKey, fileMaskEnabled, scryptN, scryptR, scryptP,
-    writeSavePath}
-
-    ipcRenderer.send('writeError', {modeState: {...modeState}, path: data.write_path, backendError:
-        data.error})
-})
-
 /*
     *** Start: ***
 */
 
 // Loading first step, depending on whether the 'run once screen has previously appeared
-axios.get('http://localhost:7218/write/show-once').then((response) =>
+axios.get(`${backendLocation}/write/show-once`).then((response) =>
     {
         stepZeroValid = !response.data.has_ran
         if (stepZeroValid) {

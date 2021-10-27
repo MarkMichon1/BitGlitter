@@ -3,6 +3,7 @@ const path = require('path')
 const { appVersion } = require('../../config')
 
 const errorDump = (readOrWrite, modeState, backendError, dirPath) => {
+    console.log(backendError)
     const date = new Date()
     const formattedDateFileSafe = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`
     const stream = fs.createWriteStream(`${path.join(dirPath, `${readOrWrite} Error ${formattedDateFileSafe}.txt`)}`)

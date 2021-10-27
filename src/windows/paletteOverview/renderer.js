@@ -1,6 +1,7 @@
 const axios = require('axios')
 const { ipcRenderer, remote } = require('electron')
 
+const { backendLocation } = require('../../../config')
 const { sortPaletteList } = require('../../utilities/palette')
 
 let paletteList = []
@@ -80,7 +81,7 @@ const deletePaletteButtonHandler = () => {
             deleteButton.textContent = 'You sure?'
             deletePaletteAreYouSure = true
         } else {
-            axios.post('http://localhost:7218/palettes/remove', {'palette_id': activePalette.palette_id}).then((response) =>
+            axios.post(`${backendLocation}/palettes/remove`, {'palette_id': activePalette.palette_id}).then((response) =>
                 {
                     paletteList = paletteList.filter(item => item.palette_id !== activePalette.palette_id)
                     activePaletteLi.remove()
@@ -173,7 +174,7 @@ const loadFirstPalette = () => {
 
 
 const refreshPaletteList = initial => {
-    axios.get('http://localhost:7218/palettes').then((response) => {
+    axios.get(`${backendLocation}/palettes`).then((response) => {
         paletteList = response.data
         sortPaletteList()
         paletteList.forEach(palette => {

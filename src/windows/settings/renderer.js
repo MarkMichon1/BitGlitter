@@ -1,6 +1,7 @@
 const axios = require('axios')
 const { ipcRenderer, remote } = require('electron')
 
+const { backendLocation } = require('../../../config')
 const display = require('../../utilities/display')
 
 // HTML Elements
@@ -41,7 +42,7 @@ cancelButton.addEventListener('click', () => {
 })
 
 saveButton.addEventListener('click',() => {
-    axios.post('http://localhost:7218/config/settings',
+    axios.post(`${backendLocation}/config/settings`,
         {
             'write_path': writePath,
             'read_path': readPath,
@@ -57,7 +58,7 @@ saveButton.addEventListener('click',() => {
 })
 
 // Load current config
-axios.get('http://localhost:7218/config/settings').then((res) => {
+axios.get(`${backendLocation}/config/settings`).then((res) => {
     const response = res.data
     writePath = response.write_path
     writeOutputDirPathOutputElement.textContent = display.abridgedPath(writePath)

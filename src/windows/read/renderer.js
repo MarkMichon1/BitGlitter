@@ -2,8 +2,8 @@ const axios = require('axios')
 const { ipcRenderer, remote } = require('electron')
 const io = require("socket.io-client");
 
-const { abridgedPath, checkStringASCII, frameorFrames,
-    humanizeFileSize } = require("../../utilities/display");
+const { backendLocation } = require('../../../config')
+const { abridgedPath, checkStringASCII, frameorFrames, humanizeFileSize } = require("../../utilities/display");
 const { manifestRender } = require('../../utilities/manifestRender')
 
 /*
@@ -272,7 +272,7 @@ let extractedFileCount = 0
 const socket = io('ws://localhost:7218')
 
 const readStart = ()=> {
-    axios.post('http://localhost:7218/read/', {
+    axios.post(`${backendLocation}/read/`, {
         file_path: 0,
         stop_at_metadata_load: stopAtMetadata,
         unpackage_files: unpackageFiles,
@@ -355,8 +355,8 @@ socket.on('metadata-receive', data => {
     streamSHAMetaElement.textContent = data.stream_sha256
     streamNameElement.textContent = data.stream_name
     streamDescriptionElement.textContent = data.stream_description
-    payloadSizeElement.textContent = data.payload_size
-    totalFramesElement.textContent = data.total_frames
+    payloadSizeElement.textContent = humanizeFileSize(data.payload_size)
+    totalFramesElement.textContent = `${data.total_frames} ${frameorFrames(data.total_frames)}`
     timeCreatedElement.textContent = data.time_created
     isCompressedElement.textContent = data.is_compressed
     isEncryptedElement.textContent = data.is_encrypted
