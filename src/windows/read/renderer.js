@@ -1,8 +1,9 @@
 const axios = require('axios')
+const bodyParser = require('body-parser')
+const express = require('express')
 const { ipcRenderer, remote } = require('electron')
-const io = require("socket.io-client");
 
-const { backendLocation } = require('../../../config')
+const { backendLocation, expressPort} = require('../../../config')
 const { abridgedPath, checkStringASCII, frameorFrames, humanizeFileSize } = require("../../utilities/display");
 const { manifestRender } = require('../../utilities/manifestRender')
 
@@ -264,12 +265,86 @@ const streamSHAValueElement = document.getElementById('stream-sha-read')
 const successSound = new Audio('../../../assets/mp3/success.mp3')
 const errorSound = new Audio('../../../assets/mp3/error.mp3')
 
+let framesThisSession = null
 let readSavePath = null
 let successText = null
 let streamSHA256 = null
 let extractedFileCount = 0
 
-const socket = io('ws://localhost:7218')
+
+/*
+    Express Setup
+*/
+
+const expressApp = express()
+expressApp.use(bodyParser.json())
+
+expressApp.post('/read/test', (req, res) => {
+    console.log(`Test message from backend received: ${req.body.success}`)
+    res.send(true)
+})
+
+expressApp.post('read/frame-total', (req, res) => {
+    framesThisSession = req.body.total_frames_session
+    res.send(true)
+})
+
+expressApp.post('read/frame-process', (req, res) => {
+    let frameNumber = req.body.frame_number
+    let percentage = req.body.percentage
+    readTextInfo.textContent = `Reading frame ${frameNumber}/${totalFrames}...`
+    readProgressBar.textContent = `${percentage} %`
+    readProgressBar.style.width = `${percentage}%`
+    res.send(true)
+})
+
+expressApp.post('read/stream-sha', (req, res) => {
+    streamSHA256 = req.body.sha256
+    streamSHAValueElement.textContent = streamSHA256
+    streamSHAHolderElement.classList.remove('hidden')
+    res.send(true)
+})
+
+expressApp.post('read/path', (req, res) => {
+    readSavePath = req.body.path
+    res.send(true)
+})
+
+expressApp.post('read/done', (req, res) => {
+    successSound.play()
+    readTextInfo.classList.add('text-success')
+    readTextInfo.textContent = `Read complete! ${extractedFileCount} file(s) were extracted during this operation to
+    ${readSavePath}.  See the Saved Streams window for more information on this stream.`
+    stepFourValid = true
+    nextButtonEnable()
+    nextButtonElement.textContent = 'Finish'
+    res.send(true)
+})
+
+expressApp.post('read/error', (req, res) => {
+    // Signals backend read() failed
+    errorSound.play()
+    readTextInfo.classList.add('text-secondary')
+    readTextInfo.textContent = `Read failure.  An error log has been created in your current read path directory.
+                                Please send this to use in Discord along with any other info, and we will investigate
+                                and fix this ASAP.`
+    stepFourValid = true
+    nextButtonEnable()
+
+    // Read state
+    const modeState = { inputMode, inputPath, stopAtMetadata, unpackageFiles, autoDelete, decryptionKey, scryptN,
+        scryptR, scryptP, readSavePath, streamSHA256, framesThisSession }
+
+    ipcRenderer.send('readError', {modeState: {...modeState}, path: req.body.read_path, backendError:
+        req.body.traceback})
+    res.send(true)
+})
+
+expressApp.listen(expressPort, () => {
+    console.log('ExpressJS read running')
+})
+
+//  *********************
 
 const readStart = ()=> {
     axios.post(`${backendLocation}/read/`, {
@@ -283,50 +358,6 @@ const readStart = ()=> {
         scrypt_p: scryptP
     })
 }
-
-socket.on('frame-process', data => {
-    readTextInfo.textContent = `Reading frame ${data[0]}/${data[1]}...`
-    readProgressBar.textContent = `${data[2]} %`
-    readProgressBar.style.width = `${data[2]}%`
-})
-
-socket.on('stream-sha256-receive', data => {
-    streamSHA256 = data
-    streamSHAValueElement.textContent = streamSHA256
-    streamSHAHolderElement.classList.remove('hidden')
-})
-
-socket.on('read-save-path', data => {
-    readSavePath = data
-})
-
-socket.on('read-done', () => {
-    successSound.play()
-    readTextInfo.classList.add('text-success')
-    readTextInfo.textContent = `Read complete! ${extractedFileCount} file(s) were extracted during this operation to
-    ${readSavePath}.  See the Saved Streams window for more information on this stream.`
-    stepFourValid = true
-    nextButtonEnable()
-    nextButtonElement.textContent = 'Finish'
-})
-
-socket.on('read-error', data => {
-    // Signals backend read() failed
-    errorSound.play()
-    readTextInfo.classList.add('text-secondary')
-    readTextInfo.textContent = `Read failure.  An error log has been created in your current read path directory.
-                                Please send this to use in Discord along with any other info, and we will investigate
-                                and fix this ASAP.`
-    stepFourValid = true
-    nextButtonEnable()
-
-    // Read state
-    const modeState = { inputMode, inputPath, stopAtMetadata, unpackageFiles, autoDelete, decryptionKey, scryptN,
-        scryptR, scryptP, readSavePath, streamSHA256 }
-
-    ipcRenderer.send('readError', {modeState: {...modeState}, path: data.read_path, backendError:
-        data.error})
-})
 
 /*
     *** Stream Metadata ***
@@ -350,27 +381,27 @@ const manifestTitleElement = document.getElementById('manifest-title')
 const manifestAnchorElement = document.getElementById('manifest-anchor')
 const promptSound = new Audio('../../../assets/mp3/prompt.mp3')
 
-socket.on('metadata-receive', data => {
+expressApp.post('read/metadata', (req, res) => {
     // data populate
-    streamSHAMetaElement.textContent = data.stream_sha256
-    streamNameElement.textContent = data.stream_name
-    streamDescriptionElement.textContent = data.stream_description
-    payloadSizeElement.textContent = humanizeFileSize(data.payload_size)
-    totalFramesElement.textContent = `${data.total_frames} ${frameorFrames(data.total_frames)}`
-    timeCreatedElement.textContent = data.time_created
-    isCompressedElement.textContent = data.is_compressed
-    isEncryptedElement.textContent = data.is_encrypted
-    isUsingFileMaskElement.textContent = data.file_mask_enabled
-    streamPaletteUsedElement.textContent = data.stream_palette_name
-    blockHeightElement.textContent = data.block_height
-    blockWidthElement.textContent = data.block_width
-    bgVersionUsedElement.textContent = data.bg_version
-    protocolVersionUsedElement.textContent = data.protocol
+    streamSHAMetaElement.textContent = req.body.stream_sha256
+    streamNameElement.textContent = req.body.stream_name
+    streamDescriptionElement.textContent = req.body.stream_description
+    payloadSizeElement.textContent = humanizeFileSize(req.body.payload_size)
+    totalFramesElement.textContent = `${req.body.total_frames} ${frameorFrames(req.body.total_frames)}`
+    timeCreatedElement.textContent = req.body.time_created
+    isCompressedElement.textContent = req.body.is_compressed
+    isEncryptedElement.textContent = req.body.is_encrypted
+    isUsingFileMaskElement.textContent = req.body.file_mask_enabled
+    streamPaletteUsedElement.textContent = req.body.stream_palette_name
+    blockHeightElement.textContent = req.body.block_height
+    blockWidthElement.textContent = req.body.block_width
+    bgVersionUsedElement.textContent = req.body.bg_version
+    protocolVersionUsedElement.textContent = req.body.protocol
 
-    fileManifest = data.manifest
-    manifestDecryptSuccess = data.manifest_decrypt_success
+    fileManifest = req.body.manifest
+    manifestDecryptSuccess = req.body.manifest_decrypt_success
 
-    if (manifestDecryptSuccess || !data.file_mask_enabled) {
+    if (manifestDecryptSuccess || !req.body.file_mask_enabled) {
         manifestTitleElement.textContent = 'File Manifest:'
         manifestRender(manifestAnchorElement, fileManifest)
     } else {
@@ -381,8 +412,8 @@ socket.on('metadata-receive', data => {
     promptSound.play()
     stepFourSegmentHide()
     metadataPromptSegmentLoad()
+    res.send(true)
 })
-
 
 /*
     *** Start ***
