@@ -28,13 +28,39 @@ magnitude.
 
 Combine all of these together, and you're able to move serious amounts of data. This is BitGlitter.
 
-# tba
+### Features
 `tba`
 
-# Contributing
+### Roadmap
 
-Whether there is a new feature you'd like to see added, or have input about the direction this project should go in,
-I'd love to hear from you.  Join the **[Discord server](https://discord.gg/t9uv2pZ)** and say hi!
+Here are a few possible directions this can move in which would increase its usefulness and versatility:
+- **"Splash Screen":** At the end of streams, include some cool looking rendered animation with the project logo, a
+  brief explanation of what it is, and a URL to download the software.  People not knowing what BitGlitter is will now
+  have an idea as well as a way to download it, increasing usage and fueling development of the project.  Could also
+  include metadata about the stream itself.
+- **Inline streams:** Have a stream embedded in another (non-BitGlitter) video, allowing for data to be read inside of
+  a normal, human-friendly video.  Rather than taking up the full video screen, the stream could be a bar on the top or
+  bottom of the screen, or any arbitrary shape (perhaps even animated).  This allows content creators to 'attach' files
+  to their videos, much like you can attach arbitrary files to an email.
+- **Moving heavy lifting away from Python:** While libraries like `cv2` and `numpy` are used which utilize C++, pure
+  Python is used in a few heavily used functions (thousands of times per second).  Moving these to Rust or C++ would
+  substantially speed up the software, and make new use cases possible...
+- **Livestream capabilities:** BitGlitter streams can be 'broadcast' over live video.  Reader would be able to detect
+  data streams through visual or audio cues from the multimedia, and can process/decode on the fly.  BitGlitter streams
+  are no longer restricted to 'static' files, but are open to any kind of live-streaming data, which can be optionally
+  compressed/encrypted through the original feature set.
+
+### Contributing
+
+**Let me know of your ideas and suggestions!**  There are many directions this technology can go in, and with enough interest
+your ideas can be future additions to this core library (as well as the desktop app).  If you're looking to help with
+developing it.... awesome.  All I ask is you're skilled with Python, and can write clean and structured code.  I went
+out of my way to have clear variable and function names as well as a decent amount of comments scattered throughout the
+library- it should be relatively easy to get up to speed to understand how BitGlitter works underneath the hood.
+
+Drop in and say hi on the Discord server:
+
+**https://discord.gg/t9uv2pZ**
 
 # MIT License
 
