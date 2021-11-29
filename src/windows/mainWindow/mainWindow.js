@@ -1,7 +1,8 @@
-const { app, BrowserWindow, Menu, nativeTheme, shell, ipcMain} = require('electron')
+const { app, BrowserWindow, Menu, shell, ipcMain} = require('electron')
 const { operatingSystem, productionMode } = require('../../../config')
 
 const createAboutWindow = require('../about/about')
+const createBitGlitterVerifyWindow = require('../bitglitterVerify/bitglitterVerify')
 const createPaletteOverviewWindow = require('../paletteOverview/paletteOverview')
 //const createPresetsWindow = require('../presets/presets')
 const createReadWindow = require('../read/read')
@@ -31,6 +32,7 @@ function createMainWindow () {
     const writeWindow = new WindowManager(createWriteWindow, mainWindow)
     const readWindow = new WindowManager(createReadWindow, mainWindow)
     const savedStreamWindow = new WindowManager(createSavedStreamsWindow, mainWindow)
+    const bitglitterVerifyWindow = new WindowManager(createBitGlitterVerifyWindow, mainWindow)
     const paletteOverviewWindow = new WindowManager(createPaletteOverviewWindow, mainWindow)
     const settingsWindow = new WindowManager(createSettingsWindow, mainWindow)
     const statisticsWindow = new WindowManager(createStatisticsWindow, mainWindow)
@@ -56,6 +58,13 @@ function createMainWindow () {
                     label: 'Saved Streams',
                     accelerator: 'Ctrl+S',
                     click: () => savedStreamWindow.click()
+                },
+                {
+                    type: 'separator'
+                },
+                {
+                    label: 'Verify Stream',
+                    click: () => bitglitterVerifyWindow.click()
                 },
                 {
                   type: 'separator'
@@ -136,7 +145,7 @@ function createMainWindow () {
                         type: 'separator'
                     },
                     {
-                        label: 'Reset Flask Executable',
+                        label: 'Reset Backend Executable (TODO!)',
                         click: () => {
                             console.log('Event goes here')
                         }

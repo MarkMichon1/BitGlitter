@@ -22,6 +22,8 @@ const cpuCoreCountElement = document.getElementById('cpu-core-count')
 const statisticsEnableElement = document.getElementById('enable-statistics')
 // Output stream name in write
 const streamNameEnableElement = document.getElementById('enable-stream-name')
+// Display advanced read data
+const advancedDataEnableElement = document.getElementById('enable-advanced-data')
 // Buttons
 const saveButton = document.getElementById('save-button')
 const cancelButton = document.getElementById('cancel-button')
@@ -35,6 +37,7 @@ let maximumCPUCores = null
 let maxSupportedCores = null
 let statisticsEnable = null
 let readStreamNameEnable = null
+let advancedDataEnable = null
 
 cancelButton.addEventListener('click', () => {
     const currentWindow = remote.getCurrentWindow()
@@ -51,6 +54,7 @@ saveButton.addEventListener('click',() => {
             'maximum_cpu_cores': maximumCPUCores,
             'save_statistics': statisticsEnable,
             'output_stream_title': readStreamNameEnable,
+            'display_advanced_data': advancedDataEnable
         }).then(() => {
         const currentWindow = remote.getCurrentWindow()
         currentWindow.close()
@@ -78,6 +82,8 @@ axios.get(`${backendLocation}/config/settings`).then((res) => {
     statisticsEnableElement.checked = statisticsEnable
     readStreamNameEnable = response.output_stream_title
     streamNameEnableElement.checked = readStreamNameEnable
+    advancedDataEnable = response.display_advanced_data
+    advancedDataEnableElement.checked = advancedDataEnable
     frameStrikeInputControl()
 })
 
@@ -120,6 +126,10 @@ statisticsEnableElement.addEventListener('click', () => {
 
 streamNameEnableElement.addEventListener('click', () => {
     readStreamNameEnable = streamNameEnableElement.checked
+})
+
+advancedDataEnableElement.addEventListener('click', () => {
+    advancedDataEnable = advancedDataEnableElement.checked
 })
 
 const frameStrikeInputControl = () => {

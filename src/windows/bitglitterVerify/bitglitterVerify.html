@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../../assets/css/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../../assets/css/halfmoon.min.css">
+    <link rel="stylesheet" href="../../../assets/css/helperClasses.css">
+    <script src="../../../assets/js/halfmoon.min.js" defer></script>
+    <script src="renderer.js" defer></script>
+</head>
+<body data-set-preferred-mode-onload="true">
+    <div class="container no-select">
+        <h1>Verify BitGlitter Stream</h1>
+        <p>Unsure if a particular file can be read, or is BitGlitter-encoded?  This will quickly verify that by locking
+        onto the frame (or first frame for videos), and attempting to decode the first header.</p>
+        <div>
+            <button class="btn btn-primary" type="button" id="file-path-button">Select File</button>
+            <p id="verification-status"></p>
+        </div>
+    </div>
+</body>
+</html>

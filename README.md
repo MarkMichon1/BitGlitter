@@ -38,7 +38,7 @@ Here are a few possible directions this can move in which would increase its use
   brief explanation of what it is, and a URL to download the software.  People not knowing what BitGlitter is will now
   have an idea as well as a way to download it, increasing usage and fueling development of the project.  Could also
   include metadata about the stream itself.
-- **Inline streams:** Have a stream embedded in another (non-BitGlitter) video, allowing for data to be read inside of
+- **Inline streams:** Have a stream embedded in another (non-BitGlitter) video, allowing for data to be read inside
   a normal, human-friendly video.  Rather than taking up the full video screen, the stream could be a bar on the top or
   bottom of the screen, or any arbitrary shape (perhaps even animated).  This allows content creators to 'attach' files
   to their videos, much like you can attach arbitrary files to an email.

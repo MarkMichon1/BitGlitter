@@ -57,7 +57,7 @@ function createReadWindow (parentWindow) {
                 buttonLabel: 'Select Image Files',
                 defaultPath : require('path').join(require('os').homedir(), 'Desktop'),
                 filters: [
-                    { name: 'Images', extensions: ['bmp', 'jpg', 'png'] },
+                    { name: 'Images', extensions: ['bmp', 'jpg', 'jpeg', 'png', 'webp'] },
                 ],
                 properties: [
                     'openFile',

@@ -36,18 +36,12 @@
     <hr>
     <div>
         <h3><strong>Write: Turning files into BitGlitter streams</strong></h3>
-        <div class="alert alert-secondary" role="alert">
-            <h4 class="alert-heading">(v0.9) File size, write configs, and stability</h4>
+        <div class="alert alert-primary" role="alert">
+            <h4 class="alert-heading">v0.9 Beta message on output size</h4>
             <p>
                 Its currently recommended sticking with the default config settings for write and not send payloads
                 larger than several tens of megabytes (MB).  Codecs used in video rendering still need to be optimized,
                 and files created can be quite large.
-            </p>
-            <p>
-                As for the other rendering values (palette, frame geometry, FPS, etc), if you're looking for maximum
-                stability, stick with the default values.  These have been ran and tested the most.  Some combination
-                of changed values may break the app, and if you're looking to do just that for testing/moving the app to
-                a stable v1.0, that would be nice.
             </p>
         </div>
         <h5><strong>Step 1/5: File/Folder Select</strong></h5>
@@ -150,7 +144,20 @@
     </div>
     <hr>
     <div>
+        <h3><strong>Verifying if a file is a BitGlitter stream</strong></h3>
+        <p>
+            If you have a file that you aren't sure can be read, or whether it is a BitGlitter stream or not, theres an
+            easy way to check.  On the main window, go to <strong>File -> Verify Stream.</strong>.  After selecting the
+            file, the app will test to see if it can find and read some calibration headers, as well as read the
+            initializer header present at the start of all image frames and at the beginning of each video file.  No
+            data about the stream is saved if the test passes, this is only to check if it can be read at all.
+        </p>
+    </div>
+    <hr>
+    <div>
         <h3><strong>Read: Turning BitGlitter streams back into files</strong></h3>
+        <p><strong>Supported video formats:</strong> .avi, .flv, .mov, .mp4, .wmv</p>
+        <p><strong>Supported image formats:</strong> .bmp, .jpg, .jpeg, .png, .webp</p>
         <h5><strong>Step 1/4: Encoded File Select</strong></h5>
         <p>
             Start by selecting your video or image files you'd like to decode.
@@ -348,19 +355,23 @@
             as the file.  If disabled, the <code class="code">SHA-256</code> hash of the stream will be used as the
             filename instead.
         </p>
+        <p>
+            <strong>Display Advanced Read Data</strong> shows extra information about stream reads not necessarily practical
+            for end users to see.  While its mostly meant for development and debugging purposes, enable it if you're
+            curious to see a bit more on how data is handled underneath the hood.
+        </p>
     </div>
     <hr>
     <div>
         <h3><strong>Statistics</strong></h3>
         <p>
-            This is nothing but some interesting statistics to view your usage with BitGlitter.  They get updated at the
+            This contains some interesting statistics to view your usage with BitGlitter.  They get updated at the
             end of each read or write cycle.  Pressing <strong>Clear</strong> resets all values back to zero.  You can
             toggle this functionality in the settings window.
         </p>
     </div>
     <hr>
     <div>
-        <h3><strong>In closing...</strong></h3>
         <p>
             I hope the guide gave you a better understanding of BitGlitter and how it works.  It was a lot of work
             putting this all together, but its a great feeling to finally release this to the world.

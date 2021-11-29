@@ -1,4 +1,5 @@
 const { BrowserWindow } = require('electron')
+const WindowManager = require('../../utilities/windowManager')
 const { operatingSystem, productionMode } = require('../../../config')
 
 function createSavedStreamsWindow (parentWindow) {
