@@ -33,7 +33,10 @@ function createBitGlitterVerifyWindow (parentWindow) {
             buttonLabel: 'Select file to verify',
             defaultPath : require('path').join(require('os').homedir(), 'Desktop'),
             filters: [
-                { name: 'Files', extensions: ['avi', 'bmp', 'flv', 'jpg', 'jpeg', 'mov', 'mp4', 'png', 'wmv', 'wepb'] },
+                { name: 'Supported Formats',
+                    extensions:
+                        ['avi', 'bmp', 'flv', 'jpg', 'jpeg', 'mov', 'mp4', 'png', 'wmv', 'wepb']
+                },
             ],
             properties: [
                 'openFile'
@@ -44,6 +47,10 @@ function createBitGlitterVerifyWindow (parentWindow) {
             }
         })
     })
+    bitglitterVerifyWindow.on('closed', () => {
+        ipcMain.removeAllListeners('verifyFileDialog')
+    })
+
     return bitglitterVerifyWindow
 }
 
