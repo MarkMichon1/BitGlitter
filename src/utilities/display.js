@@ -53,4 +53,9 @@ const frameorFrames = (quantity) => {
     return 'frames'
 }
 
-module.exports = { abridgedPath, bitorBits: bitOrBits, bitsToBytes, checkStringASCII, frameorFrames, humanizeFileSize }
+const convertBoolToEnglish = (value) => {
+    return (value ? 'Yes' : 'No')
+}
+
+module.exports = { abridgedPath, bitorBits: bitOrBits, bitsToBytes, checkStringASCII, convertBoolToEnglish,
+    frameorFrames, humanizeFileSize }

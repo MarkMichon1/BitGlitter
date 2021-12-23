@@ -4,7 +4,7 @@ const express = require('express')
 const { ipcRenderer, remote } = require('electron')
 
 const { backendLocation, expressPort} = require('../../../config')
-const { abridgedPath, checkStringASCII, frameorFrames, humanizeFileSize } = require("../../utilities/display");
+const { abridgedPath, checkStringASCII, convertBoolToEnglish, frameorFrames, humanizeFileSize } = require("../../utilities/display");
 const { manifestRender } = require('../../utilities/manifestRender')
 
 /*
@@ -271,6 +271,8 @@ let successText = null
 let streamSHA256 = null
 let extractedFileCount = 0
 
+let currentStrikes = 0
+let maxStrikes = 0
 
 /*
     Express Setup
@@ -289,7 +291,7 @@ expressApp.post('read/frame-total', (req, res) => {
     res.send(true)
 })
 
-expressApp.post('read/frame-process', (req, res) => {
+expressApp.post('read/frame-position', (req, res) => {
     let frameNumber = req.body.frame_number
     let percentage = req.body.percentage
     readTextInfo.textContent = `Reading frame ${frameNumber}/${totalFrames}...`
@@ -299,7 +301,7 @@ expressApp.post('read/frame-process', (req, res) => {
 })
 
 expressApp.post('read/stream-sha', (req, res) => {
-    streamSHA256 = req.body.sha256
+    streamSHA256 = req.body.sha256  //todo: logic for multiple
     streamSHAValueElement.textContent = streamSHA256
     streamSHAHolderElement.classList.remove('hidden')
     res.send(true)
@@ -310,9 +312,20 @@ expressApp.post('read/path', (req, res) => {
     res.send(true)
 })
 
+expressApp.post('read/total-strikes', (req, res) => {
+    maxStrikes = req.body.total_strikes
+    res.send(true)
+})
+
+expressApp.post('read/new-strike', (req, res) => {
+    currentStrikes = req.body.count
+    //todo: strikeout logic or soft error?
+    res.send(true)
+})
+
 expressApp.post('read/done', (req, res) => {
     successSound.play()
-    readTextInfo.classList.add('text-success')
+    readTextInfo.classList.add('text-success') //todo: extractedFileCount
     readTextInfo.textContent = `Read complete! ${extractedFileCount} file(s) were extracted during this operation to
     ${readSavePath}.  See the Saved Streams window for more information on this stream.`
     stepFourValid = true
@@ -330,7 +343,7 @@ expressApp.post('read/error', (req, res) => {
                                 and fix this ASAP.`
     stepFourValid = true
     nextButtonEnable()
-
+    //TODO: handle hard/soft, only dump state w/ hard
     // Read state
     const modeState = { inputMode, inputPath, stopAtMetadata, unpackageFiles, autoDelete, decryptionKey, scryptN,
         scryptR, scryptP, readSavePath, streamSHA256, framesThisSession }
@@ -373,8 +386,7 @@ const isCompressedElement = document.getElementById('is-compressed')
 const isEncryptedElement = document.getElementById('is-encrypted')
 const isUsingFileMaskElement = document.getElementById('is-using-file-mask')
 const streamPaletteUsedElement = document.getElementById('stream-palette-used')
-const blockHeightElement = document.getElementById('block-height')
-const blockWidthElement = document.getElementById('block-width')
+const streamPaletteIDElement = document.getElementById('stream-palette-id')
 const bgVersionUsedElement = document.getElementById('bg-version-used')
 const protocolVersionUsedElement = document.getElementById('protocol-version')
 const manifestTitleElement = document.getElementById('manifest-title')
@@ -389,12 +401,11 @@ expressApp.post('read/metadata', (req, res) => {
     payloadSizeElement.textContent = humanizeFileSize(req.body.payload_size)
     totalFramesElement.textContent = `${req.body.total_frames} ${frameorFrames(req.body.total_frames)}`
     timeCreatedElement.textContent = req.body.time_created
-    isCompressedElement.textContent = req.body.is_compressed
-    isEncryptedElement.textContent = req.body.is_encrypted
-    isUsingFileMaskElement.textContent = req.body.file_mask_enabled
-    streamPaletteUsedElement.textContent = req.body.stream_palette_name
-    blockHeightElement.textContent = req.body.block_height
-    blockWidthElement.textContent = req.body.block_width
+    isCompressedElement.textContent = convertBoolToEnglish(req.body.is_compressed)
+    isEncryptedElement.textContent = convertBoolToEnglish(req.body.is_encrypted)
+    isUsingFileMaskElement.textContent = convertBoolToEnglish(req.body.file_mask_enabled)
+    streamPaletteUsedElement.textContent = req.body.stream_palette_name ? req.body.stream_palette_name : 'Not decoded yet'
+    streamPaletteIDElement.textContent = req.body.stream_palette_id
     bgVersionUsedElement.textContent = req.body.bg_version
     protocolVersionUsedElement.textContent = req.body.protocol
 
@@ -403,7 +414,7 @@ expressApp.post('read/metadata', (req, res) => {
 
     if (manifestDecryptSuccess || !req.body.file_mask_enabled) {
         manifestTitleElement.textContent = 'File Manifest:'
-        manifestRender(manifestAnchorElement, fileManifest)
+        manifestRender(manifestAnchorElement, fileManifest) //todo
     } else {
         manifestTitleElement.textContent = 'Incorrect decryption key, cannot display manifest'
     }
