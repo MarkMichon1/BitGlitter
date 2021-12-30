@@ -150,7 +150,7 @@
                 <span data-toggle="tooltip" data-title="The stream's unique fingerprint from the files contained">
                     <i class="bi bi-question-circle blue"></i>
                 </span>  SHA-256 hash:
-                <code id="stream-sha-read" class="can-select code" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted"></code>
+                <div><code id="stream-sha-read" class="can-select code" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted"></code></div>
             </p>
         </div>
     </div>
@@ -264,6 +264,17 @@
                 </th>
                 <td>
                     <div id="protocol-version" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Frame Dimensions
+                </th>
+                <td>
+                    <div class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">
+                        <span id="block-height"></span> blocks tall,
+                        <span id="block-width"></span> blocks wide
+                    </div>
                 </td>
             </tr>
         </table>

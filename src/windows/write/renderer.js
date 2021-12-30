@@ -573,7 +573,7 @@ expressApp.post('/write/write-render', (req, res) => {
     let frameNumber = req.body.frame_number
     let percentage = req.body.percentage
 
-    renderTextInfo.textContent = `Generating frame ${frameNumber}/${totalFrames}...`
+    renderTextInfo.textContent = `Generating frame ${frameNumber}/${totalFrames} ...`
     renderProgressBar.textContent = `${percentage} %`
     renderProgressBar.style.width = `${percentage}%`
     res.send(true)

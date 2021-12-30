@@ -9,6 +9,7 @@ const createReadWindow = require('../read/read')
 const createSavedStreamsWindow = require('../savedStreams/savedStreams')
 const createSettingsWindow = require('../settings/settings')
 const createStatisticsWindow = require('../statistics/statistics')
+const createTestWindow = require('../test/test')
 const createUserGuideWindow = require('../userGuide/userGuide')
 const createWriteWindow = require('../write/write')
 const WindowManager = require('../../utilities/windowManager')
@@ -36,6 +37,7 @@ function createMainWindow () {
     const paletteOverviewWindow = new WindowManager(createPaletteOverviewWindow, mainWindow)
     const settingsWindow = new WindowManager(createSettingsWindow, mainWindow)
     const statisticsWindow = new WindowManager(createStatisticsWindow, mainWindow)
+    const testWindow = new WindowManager(createTestWindow, mainWindow)
     const userGuideWindow = new WindowManager(createUserGuideWindow, mainWindow)
     const aboutWindow = new WindowManager(createAboutWindow, mainWindow)
 
@@ -145,6 +147,11 @@ function createMainWindow () {
                         type: 'separator'
                     },
                     {
+                        label: 'Test Window',
+                        click: () => testWindow.click()
+                    },
+                    {
+                        //todo
                         label: 'Reset Backend Executable (TODO!)',
                         click: () => {
                             console.log('Event goes here')

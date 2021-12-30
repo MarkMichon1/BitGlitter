@@ -51,7 +51,7 @@ function createReadWindow (parentWindow) {
                     readWindow.webContents.send('updateReadInput', {result: result, type: 'video'})
                 }
             })
-        } else if (data === 'images') {
+        } else if (data === 'image') {
 
             dialog.showOpenDialog({
                 buttonLabel: 'Select Image Files',

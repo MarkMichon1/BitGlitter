@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../../../assets/css/bootstrap-icons.css">
+    <link rel="stylesheet" href="../../../assets/css/halfmoon.min.css">
+    <link rel="stylesheet" href="../../../assets/css/helperClasses.css">
+    <script src="../../../assets/js/halfmoon.min.js" defer></script>
+    <script src="renderer.js" defer></script>
+</head>
+<body data-set-preferred-mode-onload="true">
+<div class="container no-select">
+    <h1>Read BitGlitter Stream</h1>
+    <button class="btn" type="button" id="start-button">Start</button>
+    <h2 id="step-title">Placeholder</h2>
+    <!-- 5/4 Metadata Prompt -->
+    <div class="no-display" id="metadata-prompt">
+        <div>This data was decoded from the stream.  Check it out- you can either continue reading the stream, or can cancel it.</div>
+        <div class="text-center mt-10">
+            <p>
+                <span data-toggle="tooltip" data-title="The stream's unique fingerprint from the files contained">
+                    <i class="bi bi-question-circle blue"></i>
+                </span>  SHA-256 hash:
+                <code id="stream-sha-meta" class="can-select code" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</code>
+            </p>
+        </div>
+        <table class="table">
+            <tr>
+                <th>
+                    Stream Name
+                </th>
+                <td>
+                    <div id="stream-name" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Stream Description
+                </th>
+                <td>
+                    <div id="stream-description" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Payload Size
+                </th>
+                <td>
+                    <div id="payload-size" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Total Frames
+                </th>
+                <td>
+                    <div id="total-frames" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Time Created
+                </th>
+                <td>
+                    <div id="time-created" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Compressed Payload?
+                </th>
+                <td>
+                    <div id="is-compressed" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Encrypted Payload?
+                </th>
+                <td>
+                    <div id="is-encrypted" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    File Mask Enabled?
+                </th>
+                <td>
+                    <div id="is-using-file-mask" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Stream Palette Name
+                </th>
+                <td>
+                    <div id="stream-palette-used" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    Stream Palette ID
+                </th>
+                <td>
+                    <div id="stream-palette-id" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="What version of the software was used to create this stream">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  BitGlitter Version
+                </th>
+                <td>
+                    <div id="bg-version-used" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+            <tr>
+                <th>
+                    <span data-toggle="tooltip" data-title="(DEV) What protocol version was used in the stream">
+                        <i class="bi bi-question-circle blue"></i>
+                    </span>  Protocol Version
+                </th>
+                <td>
+                    <div id="protocol-version" class="can-select text-center" data-toggle="tooltip" data-title="Ctrl+C to copy when highlighted">---</div>
+                </td>
+            </tr>
+        </table>
+        <h3 id="manifest-title">File Manifest:</h3>
+        <div id="manifest-anchor">---</div>
+    </div>
+    <div class="mt-20 button-box">
+        <button class="btn" type="button" id="cancel-button">Cancel</button>
+        <button class="btn ml-10" type="button" disabled="disabled" id="back-button">Back</button>
+        <button class="btn btn-primary ml-10" type="button" disabled="disabled" id="next-button">Next</button>
+    </div>
+</div>
+</body>
+</html>

@@ -2,7 +2,7 @@ const os = require("os");
 
 // Configurable
 const appVersion = '1.0'
-const productionMode = true // turn to true when compiling!
+const productionMode = false // turn to true when compiling!
 const backendLocation = 'http://127.0.0.1:21168'
 const expressPort = 8787
 

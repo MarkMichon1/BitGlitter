@@ -26,7 +26,7 @@ const cancelButtonElement = document.getElementById('cancel-button')
 const backButtonElement = document.getElementById('back-button')
 const nextButtonElement = document.getElementById('next-button')
 
-let stepOneValid = true //todo temp, change
+let stepOneValid = false
 let stepTwoValid = true
 let stepThreeValid = true
 let stepFourValid = true
@@ -160,14 +160,14 @@ videoInputRadioElement.addEventListener('change', () => {
 })
 
 imagesInputRadioElement.addEventListener('change', () => {
-    inputMode = 'images'
+    inputMode = 'image'
     resetStepOneState()
 })
 
 inputPathButtonElement.addEventListener('click', () => {
     if (inputMode === 'video') {
         ipcRenderer.send('readPathDialog', inputMode)
-    } else if (inputMode === 'images') {
+    } else if (inputMode === 'image') {
         ipcRenderer.send('readPathDialog', inputMode)
     }
 })
@@ -180,6 +180,7 @@ ipcRenderer.on('updateReadInput', (event, data) => {
     } else {
         filePathDisplayElement.textContent = `${inputPath.length} images selected`
     }
+    stepOneValid = true
     nextButtonEnable()
 })
 
@@ -267,12 +268,15 @@ const errorSound = new Audio('../../../assets/mp3/error.mp3')
 
 let framesThisSession = null
 let readSavePath = null
-let successText = null
-let streamSHA256 = null
 let extractedFileCount = 0
+let singleSHARan = false
+let streamSHA256 = null
 
 let currentStrikes = 0
 let maxStrikes = 0
+
+let errorLevel = null
+let errorOccurred = false
 
 /*
     Express Setup
@@ -286,90 +290,124 @@ expressApp.post('/read/test', (req, res) => {
     res.send(true)
 })
 
-expressApp.post('read/frame-total', (req, res) => {
+expressApp.post('/read/frame-total', (req, res) => {
     framesThisSession = req.body.total_frames_session
     res.send(true)
 })
 
-expressApp.post('read/frame-position', (req, res) => {
-    let frameNumber = req.body.frame_number
-    let percentage = req.body.percentage
-    readTextInfo.textContent = `Reading frame ${frameNumber}/${totalFrames}...`
+expressApp.post('/read/frame-position', (req, res) => {
+    let frameNumber = req.body.frame_position
+    let percentage = ((frameNumber * 100) / framesThisSession).toFixed(3)
+    let readText = `Reading frame ${frameNumber}/${framesThisSession} ...`
+    if (maxStrikes && currentStrikes) {
+        readText = `${readText} (Bad frame strike ${currentStrikes}/${maxStrikes})`
+    }
+    readTextInfo.textContent = readText
     readProgressBar.textContent = `${percentage} %`
     readProgressBar.style.width = `${percentage}%`
     res.send(true)
 })
 
-expressApp.post('read/stream-sha', (req, res) => {
-    streamSHA256 = req.body.sha256  //todo: logic for multiple
-    streamSHAValueElement.textContent = streamSHA256
-    streamSHAHolderElement.classList.remove('hidden')
+expressApp.post('/read/stream-sha', (req, res) => {
+    if (singleSHARan === false) {
+        singleSHARan = true
+        streamSHA256 = req.body.sha256
+        streamSHAValueElement.textContent = streamSHA256
+        streamSHAHolderElement.classList.remove('hidden')
+    }   else {
+        if (req.body.sha256 !== streamSHA256) {
+            streamSHAValueElement.textContent = 'Multiple streams detected'
+        }
+    }
     res.send(true)
 })
 
-expressApp.post('read/path', (req, res) => {
+expressApp.post('/read/path', (req, res) => {
     readSavePath = req.body.path
+    console.log(`Read save path: ${readSavePath}`)
     res.send(true)
 })
 
-expressApp.post('read/total-strikes', (req, res) => {
+expressApp.post('/read/total-strikes', (req, res) => {
     maxStrikes = req.body.total_strikes
     res.send(true)
 })
 
-expressApp.post('read/new-strike', (req, res) => {
+expressApp.post('/read/new-strike', (req, res) => {
     currentStrikes = req.body.count
-    //todo: strikeout logic or soft error?
+    console.log(`New strike: ${currentStrikes}/${maxStrikes}`)
     res.send(true)
 })
 
-expressApp.post('read/done', (req, res) => {
-    successSound.play()
-    readTextInfo.classList.add('text-success') //todo: extractedFileCount
-    readTextInfo.textContent = `Read complete! ${extractedFileCount} file(s) were extracted during this operation to
-    ${readSavePath}.  See the Saved Streams window for more information on this stream.`
+expressApp.post('/read/done', (req, res) => {
+    console.log('Read complete.')
+    if (errorOccurred === false) {
+        extractedFileCount = req.body.extracted_file_count
+        successSound.play()
+        readTextInfo.classList.add('text-success')
+        readTextInfo.textContent = `Read complete! ${extractedFileCount} file(s) were extracted during this operation to
+        ${readSavePath}.  See the Saved Streams window for more information on this stream.`
+
+        stepFourValid = true
+        nextButtonEnable()
+        nextButtonElement.textContent = 'Finish'
+        res.send(true)
+    }
+})
+
+expressApp.post('/read/error', (req, res) => {
+    errorLevel = req.body.level
+    console.log(`Error: ${errorLevel}`)
+
+    // Signals backend read() failed
+    errorOccurred = true
+    errorSound.play()
+    readTextInfo.classList.add('text-secondary')
+
+    if (errorLevel === 'hard') {
+        const modeState = { inputMode, inputPath, stopAtMetadata, unpackageFiles, autoDelete, decryptionKey, scryptN,
+            scryptR, scryptP, readSavePath, streamSHA256, framesThisSession }
+        ipcRenderer.send('readError', {modeState: {...modeState}, path: req.body.read_path, backendError:
+            req.body.traceback})
+        readTextInfo.textContent = `Read failure (backend).  An error log has been created in your current read path 
+                                    directory.  Please send this to use in Discord along with any other info, and we 
+                                    will investigate and fix this ASAP.`
+    } else if (errorLevel === 'soft') {
+        let typeOfError = req.body.type_of_error
+        if (typeOfError === 'corruption') {
+            readTextInfo.textContent = 'Error: Corrupted stream setup data, can not continue.'
+        } else if (typeOfError === 'strike') {
+            readTextInfo.textContent = `Error: Reached maximum bad frame strikes (${maxStrikes}).  This can be
+                                        configured in settings window.`
+        }
+    }
+
     stepFourValid = true
     nextButtonEnable()
     nextButtonElement.textContent = 'Finish'
     res.send(true)
 })
 
-expressApp.post('read/error', (req, res) => {
-    // Signals backend read() failed
-    errorSound.play()
-    readTextInfo.classList.add('text-secondary')
-    readTextInfo.textContent = `Read failure.  An error log has been created in your current read path directory.
-                                Please send this to use in Discord along with any other info, and we will investigate
-                                and fix this ASAP.`
-    stepFourValid = true
-    nextButtonEnable()
-    //TODO: handle hard/soft, only dump state w/ hard
-    // Read state
-    const modeState = { inputMode, inputPath, stopAtMetadata, unpackageFiles, autoDelete, decryptionKey, scryptN,
-        scryptR, scryptP, readSavePath, streamSHA256, framesThisSession }
-
-    ipcRenderer.send('readError', {modeState: {...modeState}, path: req.body.read_path, backendError:
-        req.body.traceback})
-    res.send(true)
-})
-
 expressApp.listen(expressPort, () => {
-    console.log('ExpressJS read running')
+    console.log(`ExpressJS read running on ${expressPort}`)
 })
 
-//  *********************
+//  ********** Start Read **********
 
 const readStart = ()=> {
-    axios.post(`${backendLocation}/read/`, {
-        file_path: 0,
+    readParameters = {
+        file_path: inputPath,
+        input_type: inputMode,
         stop_at_metadata_load: stopAtMetadata,
-        unpackage_files: unpackageFiles,
+        auto_unpackage_stream: unpackageFiles,
         auto_delete_finished_stream: autoDelete,
         decryption_key: decryptionKey,
         scrypt_n: scryptN,
         scrypt_r: scryptR,
         scrypt_p: scryptP
-    })
+    }
+    console.log(`Read starting.  Parameters: ${JSON.stringify(readParameters)}`)
+    axios.post(`${backendLocation}/read/`, readParameters)
 }
 
 /*
@@ -389,34 +427,53 @@ const streamPaletteUsedElement = document.getElementById('stream-palette-used')
 const streamPaletteIDElement = document.getElementById('stream-palette-id')
 const bgVersionUsedElement = document.getElementById('bg-version-used')
 const protocolVersionUsedElement = document.getElementById('protocol-version')
+const blockHeightElement = document.getElementById('block-height')
+const blockWidthElement = document.getElementById('block-width')
 const manifestTitleElement = document.getElementById('manifest-title')
 const manifestAnchorElement = document.getElementById('manifest-anchor')
 const promptSound = new Audio('../../../assets/mp3/prompt.mp3')
 
-expressApp.post('read/metadata', (req, res) => {
-    // data populate
+expressApp.post('/read/metadata', (req, res) => {
+    console.log(`Metadata received: ${JSON.stringify(req.body)}`)
+    encryptedString = 'Encrypted, input correct decryption key to unlock stream!'
+    manifestDecryptSuccess = req.body.manifest_decrypt_success
     streamSHAMetaElement.textContent = req.body.stream_sha256
-    streamNameElement.textContent = req.body.stream_name
-    streamDescriptionElement.textContent = req.body.stream_description
-    payloadSizeElement.textContent = humanizeFileSize(req.body.payload_size)
+    streamNameElement.textContent = req.body.stream_name ? manifestDecryptSuccess : encryptedString
+
+    if (manifestDecryptSuccess) {
+        if (req.body.stream_description) {
+            streamDescriptionElement.textContent = req.body.stream_description
+        } else {
+            streamDescriptionElement.textContent = 'No description provided'
+        }
+        let timeCreated = new Date(req.body.time_created * 1000)
+        timeCreatedElement.textContent = timeCreated.toString()
+    } else {
+        streamDescriptionElement.textContent = encryptedString
+        timeCreatedElement.textContent = encryptedString
+    }
+
+    payloadSizeElement.textContent = humanizeFileSize(req.body.size_in_bytes)
     totalFramesElement.textContent = `${req.body.total_frames} ${frameorFrames(req.body.total_frames)}`
-    timeCreatedElement.textContent = req.body.time_created
+
     isCompressedElement.textContent = convertBoolToEnglish(req.body.is_compressed)
     isEncryptedElement.textContent = convertBoolToEnglish(req.body.is_encrypted)
     isUsingFileMaskElement.textContent = convertBoolToEnglish(req.body.file_mask_enabled)
-    streamPaletteUsedElement.textContent = req.body.stream_palette_name ? req.body.stream_palette_name : 'Not decoded yet'
+    streamPaletteUsedElement.textContent = req.body.palette_name ? req.body.palette_name : 'Not decoded yet'
     streamPaletteIDElement.textContent = req.body.stream_palette_id
-    bgVersionUsedElement.textContent = req.body.bg_version
-    protocolVersionUsedElement.textContent = req.body.protocol
+    bgVersionUsedElement.textContent = req.body.bg_version ? manifestDecryptSuccess : encryptedString
+    protocolVersionUsedElement.textContent = req.body.protocol_version
+
+    blockHeightElement.textContent = req.body.block_height.toLocaleString()
+    blockWidthElement.textContent = req.body.block_width.toLocaleString()
 
     fileManifest = req.body.manifest
-    manifestDecryptSuccess = req.body.manifest_decrypt_success
 
     if (manifestDecryptSuccess || !req.body.file_mask_enabled) {
         manifestTitleElement.textContent = 'File Manifest:'
-        manifestRender(manifestAnchorElement, fileManifest) //todo
+        manifestRender(manifestAnchorElement, fileManifest)
     } else {
-        manifestTitleElement.textContent = 'Incorrect decryption key, cannot display manifest'
+        manifestAnchorElement.textContent = encryptedString
     }
 
     // step switch
