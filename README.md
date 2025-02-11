@@ -1,3 +1,17 @@
+`2/11/25 update:` Its been a long time, hasn't it friends?  Development is starting again on BitGlitter, and it will be far better than ever.  Even though I was very happy with the reception the original python library received (30K+ downloads), the fact it was a fairly technical library inaccessible to a lot of people limited its reach.  I was working towards building an ElectronJS app to wrap it in, and in fact that was nearly 2/3 complete with the plans I had for it at the time.  But life happened, and I had to step away from working on this for a handful of years.  Despite my absense I always thought about coming back to this project and fulfilling the grand vision for what it can become.
+
+And that takes us to today.  My ultimate goal is to turn BitGlitter into a fast, easy to use app.  It'll have the same cool functionality as before, with a bunch of new features that will make it far easier/more useful to share data.  The entire codebase is being revisited and rewritten from the ground up for higher performance and to accomodate everything thats planned.  It'll be built with FastAPI for the backend, and will use Tauri as the frontend.  If you thought the original library was cool, I think you'll really like what I have planned.  
+
+So in summary:
+
+1) I'm alive
+2) Development is underway on a desktop app for it which will make it easier to use (think torrent clients)
+3) No ETA yet, but I promise you're going to like it
+
+Mark
+
+___
+
 ![BitGlitter Logo](https://i.imgur.com/pX8b4Dy.png)
 
 `v0.9 Beta`
